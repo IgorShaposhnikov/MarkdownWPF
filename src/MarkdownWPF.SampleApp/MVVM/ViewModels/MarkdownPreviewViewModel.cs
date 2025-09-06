@@ -2,7 +2,7 @@
 
 namespace MarkdownWPF.SampleApp.Mvvm.ViewModels
 {
-    public class MarkdownPreviewViewModel : ViewModelBase
+    public sealed class MarkdownPreviewViewModel : ViewModelBase
     {
         public MarkdownPreviewModel Model { get; }
 

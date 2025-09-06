@@ -1,14 +1,17 @@
-﻿using System.Collections.ObjectModel;
+﻿using MarkdownWPF.Models;
+using System.Collections.ObjectModel;
 
 namespace MarkdownWPF.SampleApp.Mvvm.Models
 {
-    public class MarkdownPreviewModel : ObservableObject
+    public sealed class MarkdownPreviewModel : ObservableObject
     {
+        private readonly MarkdownParser _parser = new();
+
+
         #region Properties
 
 
-        public ObservableCollection<object> MarkdownElements { get; } = [];
-
+        public ObservableCollection<IMarkdownElement> MarkdownElements { get; } = [];
 
         private string _markdownInput;
         public string MarkdownInput
@@ -25,18 +28,18 @@ namespace MarkdownWPF.SampleApp.Mvvm.Models
         #endregion Properties
 
 
-        public MarkdownPreviewModel()
-        {
-
-        }
-
         /// <summary>
         /// Parse MarkdownInput property to MarkdownWPF objects and update MarkdownElements collection.
         /// Runs whenever MarkdownInput property changed;
         /// </summary>
         private void OnParseTypedMarkdown()
         {
-
+            var elements = _parser.Parse(MarkdownInput);
+            MarkdownElements.Clear();
+            foreach (var element in elements) 
+            {
+                MarkdownElements.Add(element);
+            }
         }
     }
 }

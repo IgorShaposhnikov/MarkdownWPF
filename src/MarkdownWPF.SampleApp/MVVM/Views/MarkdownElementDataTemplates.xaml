@@ -1,7 +1,37 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:extensions="clr-namespace:MarkdownWPF.Extensions;assembly=MarkdownWPF"
+    xmlns:models="clr-namespace:MarkdownWPF.Models;assembly=MarkdownWPF"
+    xmlns:renderer="clr-namespace:MarkdownWPF.Renderer;assembly=MarkdownWPF"
     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <!--  Here datatemplates  -->
+
+    <renderer:MarkdownRenderer x:Key="MdRenderer" />
+
+    <DataTemplate DataType="{x:Type models:Heading}">
+        <TextBlock
+            Margin="0,10,0,5"
+            extensions:TextBlockExtensions.MarkdownRenderer="{StaticResource MdRenderer}"
+            extensions:TextBlockExtensions.Source="{Binding Value}">
+
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="40" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Level}" Value="2">
+                            <Setter Property="FontSize" Value="32" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="3">
+                            <Setter Property="FontSize" Value="24" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="4">
+                            <Setter Property="FontSize" Value="16" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </DataTemplate>
 </ResourceDictionary>
