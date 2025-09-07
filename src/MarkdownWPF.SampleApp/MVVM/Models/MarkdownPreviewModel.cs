@@ -36,7 +36,7 @@ namespace MarkdownWPF.SampleApp.Mvvm.Models
         {
             var elements = _parser.Parse(MarkdownInput);
             MarkdownElements.Clear();
-            foreach (var element in elements) 
+            foreach (var element in elements)
             {
                 MarkdownElements.Add(element);
             }

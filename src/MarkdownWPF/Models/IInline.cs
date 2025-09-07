@@ -2,6 +2,6 @@
 {
     public interface IInline : IMarkdownElement
     {
-        string Text { get; }
+        public string Text { get; }
     }
 }

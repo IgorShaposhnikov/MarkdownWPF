@@ -2,19 +2,20 @@
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
+using ParagraphBlock = Markdig.Syntax.ParagraphBlock;
 
 namespace MarkdownWPF
 {
     public class MarkdownParser
     {
-        public IEnumerable<IMarkdownElement> Parse(string text, Func<MarkdownPipeline>? getPipeline = null) 
+        public IEnumerable<IMarkdownElement> Parse(string text, Func<MarkdownPipeline>? getPipeline = null)
         {
-            if (string.IsNullOrWhiteSpace(text)) 
+            if (string.IsNullOrWhiteSpace(text))
             {
                 return [];
             }
 
-            var pipeline = getPipeline == null ? 
+            var pipeline = getPipeline == null ?
                 new MarkdownPipelineBuilder().UseAdvancedExtensions().Build() : getPipeline();
             var document = Markdown.Parse(text, pipeline);
 
@@ -28,9 +29,10 @@ namespace MarkdownWPF
         /// <returns>Collection of IMarkdownElements</returns>
         private IEnumerable<IMarkdownElement> ParseMarkdigDocument(MarkdownDocument document)
         {
+            Console.Clear();
             ICollection<IMarkdownElement> elements = [];
 
-            foreach (var mdItem in document) 
+            foreach (var mdItem in document)
             {
                 if (mdItem is HeadingBlock headingBlock)
                 {
@@ -38,10 +40,7 @@ namespace MarkdownWPF
                 }
                 if (mdItem is ParagraphBlock paragraphBlock)
                 {
-                    foreach (var inline in GetInlines(paragraphBlock.Inline))
-                    {
-                        elements.Add(inline);
-                    }
+                    elements.Add(new Models.ParagraphBlock(GetInlines(paragraphBlock.Inline)));
                 }
             }
 
@@ -55,7 +54,7 @@ namespace MarkdownWPF
         /// <returns>Collection of inline objects</returns>
         public IEnumerable<Models.IInline> GetInlines(ContainerInline? containerInline)
         {
-            if (containerInline == null) 
+            if (containerInline == null)
             {
                 return [];
             }
@@ -71,35 +70,85 @@ namespace MarkdownWPF
         /// <exception cref="NotSupportedException">Unsupported inline type</exception>
         public Models.IInline GetInline(Inline inline)
         {
+            Console.WriteLine(inline.GetType());
             if (inline is LiteralInline literalInline)
             {
-                Console.WriteLine(literalInline.Content.ToString());
                 return new Paragraph(literalInline.Content.ToString());
             }
 
             if (inline is EmphasisInline emphasisInline)
             {
-                EmphasisStyle style = EmphasisStyle.Normal;
-                EmphasisDecorations decorations = EmphasisDecorations.None;
-                EmphasisWeight weight = EmphasisWeight.Normal;
+                return TraverseEmphasis(emphasisInline, [], [], text: GetTextFromInline(emphasisInline));
+            }
 
-                if (emphasisInline.DelimiterChar == '*' || emphasisInline.DelimiterChar == '_')
-                {
-                    if (emphasisInline.DelimiterCount == 1)
-                    {
-                        style = EmphasisStyle.Italic;
-                    }
-                    else if (emphasisInline.DelimiterCount == 2)
-                    {
-                        weight = EmphasisWeight.Bold;
-                    }
-                }
-
-                return new Emphasis(GetTextFromInline(emphasisInline), weight, decorations, style);
+            if (inline is LineBreakInline lineBreakInline)
+            {
+                return new Paragraph("");
             }
 
             throw new NotSupportedException($"Unknown inline {inline} argument");
         }
+
+
+        // x - lenght of string before current element
+        // x - start current of substring in general string
+        // n - end of substring (normazlied for general string)
+        // +y - delimeter char count (start and end)
+        // 
+
+        public Emphasis TraverseEmphasis(EmphasisInline emphasisInline,
+            List<EmphasisTypography> typographyElements,
+            IList<EmphasisDecorations> decorations,
+            EmphasisStyle style = EmphasisStyle.Normal,
+            EmphasisWeight weight = EmphasisWeight.Normal,
+            bool hasHighlight = false,
+            string text = "")
+        {
+            if (emphasisInline.DelimiterChar == '*' || emphasisInline.DelimiterChar == '_')
+            {
+                if (emphasisInline.DelimiterCount == 1)
+                {
+                    style = EmphasisStyle.Italic;
+                }
+                else if (emphasisInline.DelimiterCount == 2)
+                {
+                    weight = EmphasisWeight.Bold;
+                }
+            }
+            else if (emphasisInline.DelimiterChar == '~')
+            {
+                if (emphasisInline.DelimiterCount == 1)
+                {
+                    // superscript/subscript unsupported
+                }
+                else if (emphasisInline.DelimiterCount == 2)
+                {
+                    decorations.Add(EmphasisDecorations.Strikethrough);
+                }
+            }
+            else if (emphasisInline.DelimiterChar == '+')
+            {
+                decorations.Add(EmphasisDecorations.Underline);
+            }
+            else if (emphasisInline.DelimiterChar == '=')
+            {
+                hasHighlight = true;
+            }
+
+
+            if (emphasisInline.FirstChild is EmphasisInline firstEmphasisChild)
+            {
+                return TraverseEmphasis(firstEmphasisChild, typographyElements, decorations, style, weight, hasHighlight, text);
+            }
+
+            if (emphasisInline.LastChild is EmphasisInline lastEmphasisChild)
+            {
+                return TraverseEmphasis(lastEmphasisChild, typographyElements, decorations, style, weight, hasHighlight, text);
+            }
+
+            return new Emphasis(text, typographyElements, decorations, weight, style, hasHighlight);
+        }
+
 
         /// <summary>
         /// Parse HeadingBlock (markdig) to IMarkdownElement (MarkdownWpf)
@@ -133,7 +182,6 @@ namespace MarkdownWPF
         {
             if (inline is LiteralInline literalInline)
             {
-                Console.WriteLine(literalInline.Content.ToString());
                 return literalInline.Content.ToString();
             }
 
@@ -141,21 +189,28 @@ namespace MarkdownWPF
             {
                 var text = string.Empty;
 
-                foreach (var child in containerInline)
-                {
-                    if (child is LiteralInline)
-                    {
-                        literalInline = child as LiteralInline;
-                        // TODO: Use string builder by size of content?
-                        text += literalInline.Content.ToString();
-                        Console.WriteLine(text);
-                    }
-                }
-
-                return text;
+                return GetContainerInlineText(containerInline);
             }
 
             throw new ArgumentException($"Unknown inline {inline} argument");
+        }
+
+        public string GetContainerInlineText(ContainerInline containerInline)
+        {
+            var text = "";
+            foreach (var child in containerInline)
+            {
+                if (child is LiteralInline literalInline)
+                {
+                    // TODO: Use string builder by size of content?
+                    text += (child as LiteralInline).Content.ToString();
+                }
+                else if (child is ContainerInline container)
+                {
+                    text += GetContainerInlineText(container);
+                }
+            }
+            return text;
         }
     }
 }

@@ -12,15 +12,15 @@ namespace MarkdownWPF.Extensions
 
 
         public static readonly DependencyProperty SourceProperty =
-            DependencyProperty.RegisterAttached("Source", typeof(IEnumerable), typeof(TextBlockExtensions), 
+            DependencyProperty.RegisterAttached("Source", typeof(object), typeof(TextBlockExtensions),
                 new FrameworkPropertyMetadata(null, OnSourceChanged));
 
-        public static IEnumerable GetSource(DependencyObject obj)
+        public static object GetSource(DependencyObject obj)
         {
-            return (IEnumerable)obj.GetValue(SourceProperty);
+            return (object)obj.GetValue(SourceProperty);
         }
 
-        public static void SetSource(DependencyObject obj, IEnumerable value)
+        public static void SetSource(DependencyObject obj, object value)
         {
             obj.SetValue(SourceProperty, value);
         }
@@ -51,25 +51,32 @@ namespace MarkdownWPF.Extensions
 
             var source = GetSource(textBlock);
 
-            if (source == null) 
+            if (source == null)
                 return;
 
             // Get set value of IMarkdownRenderer
             var render = GetMarkdownRenderer(textBlock);
-            
-            if (render == null) 
+
+            if (render == null)
                 return;
 
-            foreach (var item in source)
+            if (source is string text)
             {
-                // Check the item is a IInline
-                if (item is IInline mdElement)
+                textBlock.Inlines.Add(render.RenderInline(new Paragraph(text)));
+            }
+            else if (source is IEnumerable collection)
+            {
+                foreach (var item in collection)
                 {
-                    // Get renderable inline WPF element (like Run)
-                    var inline = render.RenderInline(mdElement);
-                    if (inline != null)
+                    // Check the item is a IInline
+                    if (item is IInline mdElement)
                     {
-                        textBlock.Inlines.Add(inline);
+                        // Get renderable inline WPF element (like Run)
+                        var inline = render.RenderInline(mdElement);
+                        if (inline != null)
+                        {
+                            textBlock.Inlines.Add(inline);
+                        }
                     }
                 }
             }

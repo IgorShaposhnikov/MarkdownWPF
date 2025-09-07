@@ -1,4 +1,6 @@
-﻿namespace MarkdownWPF.Models
+﻿using MarkdownWPF.Models.Base;
+
+namespace MarkdownWPF.Models
 {
     public enum EmphasisWeight
     {
@@ -6,35 +8,64 @@
         Bold,
     }
 
-    public enum EmphasisStyle 
+    public enum EmphasisStyle
     {
         Normal,
         Italic
     }
 
-    public enum EmphasisDecorations 
+    public enum EmphasisDecorations
     {
-        None,
         Baseline,
         Strikethrough,
         Overline,
         Underline,
     }
 
+    public enum EmphasisTypographyVariants
+    {
+        Normal,
+        Superscript,
+        Subscript
+    }
+
+    public readonly struct EmphasisTypography
+    {
+        public EmphasisTypographyVariants Variant { get; } = EmphasisTypographyVariants.Normal;
+        /// <summary>
+        /// Substring variant location
+        /// </summary>
+        public Span TypographySpan { get; }
+
+        public EmphasisTypography(Span typographySpan, EmphasisTypographyVariants variant)
+        {
+            TypographySpan = typographySpan;
+            Variant = variant;
+        }
+    }
+
     public class Emphasis : IInline
     {
-        public string Text { get; set; }
+        public string Text { get; }
+        public EmphasisWeight Weight { get; }
+        public IList<EmphasisDecorations> Decorations { get; } = new List<EmphasisDecorations>();
+        public EmphasisStyle Style { get; }
+        public IList<EmphasisTypography> TypographyElements { get; } = new List<EmphasisTypography>();
+        public bool HasHighlight { get; }
 
-        public Emphasis(string text, EmphasisWeight type = default, EmphasisDecorations decoration = default, EmphasisStyle style = default)
+        public Emphasis(string text,
+            IList<EmphasisTypography> typographyElements,
+            IList<EmphasisDecorations> decoration,
+            EmphasisWeight type = default,
+            EmphasisStyle style = default,
+            bool hasHighlight = default)
         {
             Text = text;
+            TypographyElements = typographyElements;
             Weight = type;
-            Decoration = decoration;
+            Decorations = decoration;
             Style = style;
+            HasHighlight = hasHighlight;
         }
-
-        public EmphasisWeight Weight { get; set; }
-        public EmphasisDecorations Decoration { get; set; }
-        public EmphasisStyle Style { get; set; }
     }
 }
