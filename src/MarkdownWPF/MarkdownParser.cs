@@ -2,7 +2,7 @@
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
-using ParagraphBlock = Markdig.Syntax.ParagraphBlock;
+using MarkdownWPF.Models.Regions;
 
 namespace MarkdownWPF
 {
@@ -40,7 +40,11 @@ namespace MarkdownWPF
                 }
                 if (mdItem is ParagraphBlock paragraphBlock)
                 {
-                    elements.Add(new Models.ParagraphBlock(GetInlines(paragraphBlock.Inline)));
+                    elements.Add(new ParagraphRegion(GetInlines(paragraphBlock.Inline)));
+                }
+                if (mdItem is CodeBlock codeBlock) 
+                {
+                    elements.Add(ToCodeRegion(codeBlock));
                 }
             }
 
@@ -211,6 +215,29 @@ namespace MarkdownWPF
                 }
             }
             return text;
+        }
+
+        public CodeRegion ToCodeRegion(CodeBlock codeBlock)
+        {
+            var codeRegion = new CodeRegion();
+
+            foreach (var line in codeBlock.Lines.Lines)
+            {
+                codeRegion.Elements.Add(new Paragraph(line.Slice.ToString()));
+            }
+
+            var tmpElements = codeRegion.Elements;
+            for (var i = tmpElements.Count - 1; i > 0; i--) 
+            {
+                if (!string.IsNullOrEmpty(tmpElements[i].Text)) 
+                {
+                    break;
+                }
+
+                codeRegion.Elements.RemoveAt(i);
+            }
+
+            return codeRegion;
         }
     }
 }
