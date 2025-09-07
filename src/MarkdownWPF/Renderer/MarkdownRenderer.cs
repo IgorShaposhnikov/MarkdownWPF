@@ -45,6 +45,14 @@ namespace MarkdownWPF.Renderer
 
                 Console.WriteLine("All Text: " + run.Text);
             }
+            else if (inline is InlineCode) 
+            {
+                // Visible "padding"
+                run.Text = $" {run.Text} ";
+                run.Background = new BrushConverter().ConvertFrom("#f9f2f4") as SolidColorBrush;
+                run.Foreground = new BrushConverter().ConvertFrom("#c7254e") as SolidColorBrush;
+            }
+
 
             return run;
         }

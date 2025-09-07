@@ -90,6 +90,11 @@ namespace MarkdownWPF
                 return new Paragraph("");
             }
 
+            if (inline is CodeInline codeInline) 
+            {
+                return new InlineCode(codeInline.Content);
+            }
+
             throw new NotSupportedException($"Unknown inline {inline} argument");
         }
 
@@ -169,7 +174,7 @@ namespace MarkdownWPF
                 inlines.Add(GetInline(inline));
             }
 
-            return new Heading(
+            return new HeadingRegion(
                 inlines,
                 headingBlock.Level);
         }
