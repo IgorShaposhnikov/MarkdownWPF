@@ -52,6 +52,7 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type regions:CodeRegion}">
+        <!--  TODO: Add Code container with syntax support (or just leave it :) )  -->
         <Border
             Padding="9.5"
             Background="#f8f8f8"

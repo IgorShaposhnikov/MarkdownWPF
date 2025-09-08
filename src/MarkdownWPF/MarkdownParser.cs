@@ -226,6 +226,11 @@ namespace MarkdownWPF
         {
             var codeRegion = new CodeRegion();
 
+            if (codeBlock.Lines.Lines == null) 
+            {
+                return codeRegion;
+            }
+
             foreach (var line in codeBlock.Lines.Lines)
             {
                 codeRegion.Elements.Add(new Paragraph(line.Slice.ToString()));
