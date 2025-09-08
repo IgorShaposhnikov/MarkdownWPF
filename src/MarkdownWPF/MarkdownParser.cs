@@ -46,6 +46,10 @@ namespace MarkdownWPF
                 {
                     elements.Add(ToCodeRegion(codeBlock));
                 }
+                if (mdItem is ThematicBreakBlock thematicBreakBlock)
+                {
+                    elements.Add(new ThematicBreakRegion(thematicBreakBlock.ThematicChar, thematicBreakBlock.ThematicCharCount));
+            }
             }
 
             return elements;

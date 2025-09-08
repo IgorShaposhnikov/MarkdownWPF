@@ -70,4 +70,11 @@
             </ItemsControl>
         </Border>
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ThematicBreakRegion}">
+        <Border
+            Height="2"
+            BorderBrush="#333"
+            BorderThickness="0,1.5,0,0" />
+    </DataTemplate>
 </ResourceDictionary>
