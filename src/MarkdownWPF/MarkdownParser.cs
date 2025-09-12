@@ -40,7 +40,31 @@ namespace MarkdownWPF
                 }
                 if (mdItem is ParagraphBlock paragraphBlock)
                 {
-                    elements.Add(new ParagraphRegion(GetInlines(paragraphBlock.Inline)));
+                    var inlinesResult = GetInlines(paragraphBlock.Inline);
+
+                    IList<Models.Inlines.IInline> inlines = [];
+                    foreach (var inline in inlinesResult)
+                    {
+                        if (inline is InlineLink inlineLink && inlineLink.IsImage)
+                        {
+                            if (inlines.Count > 0)
+                            {
+                                elements.Add(new ParagraphRegion(inlines));
+                                inlines.Clear();
+                }
+
+                            elements.Add(new ImageRegion(inlineLink));
+
+                            continue;
+                        }
+
+                        inlines.Add(inline);
+                    }
+
+                    if (inlines.Count > 0)
+                    {
+                        elements.Add(new ParagraphRegion(inlines));
+                    }
                 }
                 if (mdItem is CodeBlock codeBlock) 
                 {
@@ -60,7 +84,7 @@ namespace MarkdownWPF
         /// </summary>
         /// <param name="containerInline">Inline container</param>
         /// <returns>Collection of inline objects</returns>
-        public IEnumerable<Models.IInline> GetInlines(ContainerInline? containerInline)
+        public IEnumerable<Models.Inlines.IInline> GetInlines(ContainerInline? containerInline)
         {
             if (containerInline == null)
             {
@@ -76,7 +100,7 @@ namespace MarkdownWPF
         /// <param name="inline">Markdig Inline</param>
         /// <returns>MarkdownWPF inline type</returns>
         /// <exception cref="NotSupportedException">Unsupported inline type</exception>
-        public Models.IInline GetInline(Inline inline)
+        public Models.Inlines.IInline GetInline(Inline inline)
         {
             Console.WriteLine(inline.GetType());
             if (inline is LiteralInline literalInline)
@@ -91,7 +115,7 @@ namespace MarkdownWPF
 
             if (inline is LineBreakInline lineBreakInline)
             {
-                return new Paragraph("");
+                return new Paragraph("\n");
             }
 
             if (inline is CodeInline codeInline) 
@@ -99,7 +123,19 @@ namespace MarkdownWPF
                 return new InlineCode(codeInline.Content);
             }
 
-            throw new NotSupportedException($"Unknown inline {inline} argument");
+            if (inline is LinkInline linkInline)
+            {
+                // TODO: URL must be file path
+                return new InlineLink(GetTextFromInline(linkInline.FirstChild), linkInline.Url, linkInline.IsImage);
+        }
+
+            if (inline is LinkDelimiterInline linkDelimiterInline)
+            {
+                Console.WriteLine(inline);
+                return new Paragraph("");
+            }
+
+            throw new NotSupportedException($"Unknown inline {inline.GetType()} argument");
         }
 
 
@@ -115,7 +151,8 @@ namespace MarkdownWPF
             EmphasisStyle style = EmphasisStyle.Normal,
             EmphasisWeight weight = EmphasisWeight.Normal,
             bool hasHighlight = false,
-            string text = "")
+            string text = "",
+            IList<Models.Inlines.IInline> inlines = null)
         {
             if (emphasisInline.DelimiterChar == '*' || emphasisInline.DelimiterChar == '_')
             {
@@ -151,15 +188,25 @@ namespace MarkdownWPF
 
             if (emphasisInline.FirstChild is EmphasisInline firstEmphasisChild)
             {
-                return TraverseEmphasis(firstEmphasisChild, typographyElements, decorations, style, weight, hasHighlight, text);
+                return TraverseEmphasis(firstEmphasisChild, typographyElements, decorations, style, weight, hasHighlight, text, inlines);
             }
 
             if (emphasisInline.LastChild is EmphasisInline lastEmphasisChild)
             {
-                return TraverseEmphasis(lastEmphasisChild, typographyElements, decorations, style, weight, hasHighlight, text);
+                return TraverseEmphasis(lastEmphasisChild, typographyElements, decorations, style, weight, hasHighlight, text, inlines);
             }
 
-            return new Emphasis(text, typographyElements, decorations, weight, style, hasHighlight);
+            if (emphasisInline.FirstChild is LinkInline firstLinkInline)
+            {
+                if (inlines == null)
+                {
+                    inlines = new List<Models.Inlines.IInline>();
+        }
+
+                inlines.Add(new InlineLink(GetTextFromInline(firstLinkInline.FirstChild), firstLinkInline.Url, firstLinkInline.IsImage));
+            }
+
+            return new Emphasis(text, typographyElements, decorations, weight, style, hasHighlight, inlines);
         }
 
 
@@ -170,7 +217,7 @@ namespace MarkdownWPF
         /// <returns>Heading</returns>
         public IMarkdownElement GetHeader(HeadingBlock headingBlock)
         {
-            var inlines = new List<Models.IInline>();
+            var inlines = new List<Models.Inlines.IInline>();
 
             // select all inline from HeadingBlock
             foreach (var inline in headingBlock.Inline)
@@ -193,6 +240,11 @@ namespace MarkdownWPF
         /// <exception cref="ArgumentException"></exception>
         public string GetTextFromInline<T>(T inline) where T : Inline
         {
+            if (inline == null)
+            {
+                return string.Empty;
+            }
+
             if (inline is LiteralInline literalInline)
             {
                 return literalInline.Content.ToString();
@@ -237,10 +289,10 @@ namespace MarkdownWPF
 
             foreach (var line in codeBlock.Lines.Lines)
             {
-                codeRegion.Elements.Add(new Paragraph(line.Slice.ToString()));
+                codeRegion.Value.Add(new Paragraph(line.Slice.ToString()));
             }
 
-            var tmpElements = codeRegion.Elements;
+            var tmpElements = codeRegion.Value;
             for (var i = tmpElements.Count - 1; i > 0; i--) 
             {
                 if (!string.IsNullOrEmpty(tmpElements[i].Text)) 
@@ -248,10 +300,34 @@ namespace MarkdownWPF
                     break;
                 }
 
-                codeRegion.Elements.RemoveAt(i);
+                codeRegion.Value.RemoveAt(i);
             }
 
             return codeRegion;
+        }
+
+        public static bool CheckURLValid(string url)
+        {
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                return false;
+            }
+
+            if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uriResult))
+            {
+                try
+                {
+                    return uriResult.Scheme == Uri.UriSchemeHttp
+                        || uriResult.Scheme == Uri.UriSchemeHttps
+                        || uriResult.Scheme == Uri.UriSchemeFile;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            return false;
         }
     }
 }

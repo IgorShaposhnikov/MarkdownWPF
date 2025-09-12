@@ -61,6 +61,7 @@
             Grid.Column="1"
             Padding="0"
             ItemsSource="{Binding Model.MarkdownElements}"
-            Style="{StaticResource TransparentListBox}" />
+            Style="{StaticResource TransparentListBox}"
+            VirtualizingPanel.ScrollUnit="Pixel" />
     </Grid>
 </UserControl>

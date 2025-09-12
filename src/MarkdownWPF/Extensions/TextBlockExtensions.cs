@@ -1,4 +1,4 @@
-﻿using MarkdownWPF.Models;
+﻿using MarkdownWPF.Models.Inlines;
 using MarkdownWPF.Renderer;
 using System.Collections;
 using System.Windows;
@@ -69,7 +69,13 @@ namespace MarkdownWPF.Extensions
                 foreach (var item in collection)
                 {
                     // Check the item is a IInline
-                    if (item is IInline mdElement)
+                    if (item is InlineContainer container)
+                    {
+                        textBlock.Inlines.AddRange(
+                            render.RenderInlineContainer(container)
+                            );
+                    }
+                    else if (item is IInline mdElement)
                     {
                         // Get renderable inline WPF element (like Run)
                         var inline = render.RenderInline(mdElement);

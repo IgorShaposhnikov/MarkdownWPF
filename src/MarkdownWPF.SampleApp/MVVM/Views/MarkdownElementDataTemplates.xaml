@@ -14,7 +14,7 @@
         <TextBlock
             Margin="0,10,0,5"
             extensions:TextBlockExtensions.MarkdownRenderer="{StaticResource MdRenderer}"
-            extensions:TextBlockExtensions.Source="{Binding Elements}"
+            extensions:TextBlockExtensions.Source="{Binding Value}"
             TextWrapping="WrapWithOverflow" />
     </DataTemplate>
 
@@ -23,7 +23,7 @@
         <TextBlock
             Margin="0,10,0,5"
             extensions:TextBlockExtensions.MarkdownRenderer="{StaticResource MdRenderer}"
-            extensions:TextBlockExtensions.Source="{Binding Elements}"
+            extensions:TextBlockExtensions.Source="{Binding Value}"
             TextWrapping="WrapWithOverflow">
 
             <TextBlock.Style>
@@ -58,7 +58,7 @@
             Background="#f8f8f8"
             BorderBrush="#333"
             BorderThickness="1">
-            <ItemsControl ItemsSource="{Binding Elements}">
+            <ItemsControl ItemsSource="{Binding Value}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <TextBlock
@@ -76,5 +76,12 @@
             Height="2"
             BorderBrush="#333"
             BorderThickness="0,1.5,0,0" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ImageRegion}">
+        <Image
+            Source="{Binding Value.Url}"
+            Stretch="Uniform"
+            StretchDirection="DownOnly" />
     </DataTemplate>
 </ResourceDictionary>

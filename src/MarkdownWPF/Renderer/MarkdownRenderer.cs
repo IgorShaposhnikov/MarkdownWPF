@@ -1,4 +1,5 @@
-﻿using MarkdownWPF.Models;
+﻿using MarkdownWPF.Models.Inlines;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Media;
@@ -45,16 +46,44 @@ namespace MarkdownWPF.Renderer
 
                 Console.WriteLine("All Text: " + run.Text);
             }
-            else if (inline is InlineCode) 
+            else if (inline is InlineCode)
             {
                 // Visible "padding"
                 run.Text = $" {run.Text} ";
                 run.Background = new BrushConverter().ConvertFrom("#f9f2f4") as SolidColorBrush;
                 run.Foreground = new BrushConverter().ConvertFrom("#c7254e") as SolidColorBrush;
             }
+            else if (inline is InlineLink inlineLink)
+            {
+                var hyperLink = new Hyperlink();
+                hyperLink.Click += (s, e) =>
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo() { FileName = inlineLink.Url, UseShellExecute = true });
+                    }
+                    catch
+                    {
+
+                    }
+                };
+
+                hyperLink.Inlines.Add(run);
+                return hyperLink;
+            }
 
 
             return run;
+        }
+
+        public IEnumerable<Inline> RenderInlineContainer(InlineContainer container)
+        {
+            if (container.IsTextOnly)
+            {
+                return [RenderInline(container)];
+            }
+
+            return container.Inlines.Select(RenderInline);
         }
 
         private TextDecorationCollection GetDecorationByType(EmphasisDecorations decoration)

@@ -1,10 +1,12 @@
-﻿namespace MarkdownWPF.Models.Regions
+﻿using MarkdownWPF.Models.Inlines;
+
+namespace MarkdownWPF.Models.Regions
 {
-    public sealed class ParagraphRegion : RegionBase<IInline>
+    public sealed class ParagraphRegion : CollectionRegionBase<IInline>
     {
         public ParagraphRegion(IEnumerable<IInline> inlines)
         {
-            Elements = inlines.ToList();
+            Value = inlines.ToList();
         }
     }
 }

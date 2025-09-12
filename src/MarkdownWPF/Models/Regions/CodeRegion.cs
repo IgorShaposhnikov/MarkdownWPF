@@ -1,6 +1,8 @@
-﻿namespace MarkdownWPF.Models.Regions
+﻿using MarkdownWPF.Models.Inlines;
+
+namespace MarkdownWPF.Models.Regions
 {
-    public class CodeRegion : RegionBase<IInline>
+    public class CodeRegion : CollectionRegionBase<IInline>
     {
 
     }

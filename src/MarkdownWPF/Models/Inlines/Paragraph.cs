@@ -1,4 +1,4 @@
-﻿namespace MarkdownWPF.Models
+﻿namespace MarkdownWPF.Models.Inlines
 {
     public class Paragraph : IInline
     {

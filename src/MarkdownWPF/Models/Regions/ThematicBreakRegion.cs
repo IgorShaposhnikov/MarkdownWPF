@@ -1,6 +1,6 @@
 ﻿namespace MarkdownWPF.Models.Regions
 {
-    public class ThematicBreakRegion : RegionBase<IMarkdownElement>
+    public class ThematicBreakRegion : CollectionRegionBase<IMarkdownElement>
     {
         public char ThematicChar { get; }
         public int ThematicCharCount { get; }
