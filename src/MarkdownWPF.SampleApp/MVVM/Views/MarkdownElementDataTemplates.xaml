@@ -84,4 +84,13 @@
             Stretch="Uniform"
             StretchDirection="DownOnly" />
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:QuoteRegion}">
+        <Border Margin="0,0,0,20"
+            Padding="20,10"
+            BorderBrush="#eee"
+            BorderThickness="5,0,0,0">
+            <ItemsControl ItemsSource="{Binding Value}" />
+        </Border>
+    </DataTemplate>
 </ResourceDictionary>

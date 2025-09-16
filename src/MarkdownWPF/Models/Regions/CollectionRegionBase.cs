@@ -9,8 +9,13 @@
         }
     }
 
-    public abstract class RegionBase<T> : IMarkdownElement
+    public abstract class RegionBase<T> : IRegion
     {
         public T Value { get; protected set; }
+    }
+
+    public interface IRegion : IMarkdownElement 
+    {
+
     }
 }

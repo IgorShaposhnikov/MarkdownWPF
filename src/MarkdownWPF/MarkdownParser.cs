@@ -2,6 +2,7 @@
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
+using MarkdownWPF.Models.Inlines;
 using MarkdownWPF.Models.Regions;
 
 namespace MarkdownWPF
@@ -30,53 +31,74 @@ namespace MarkdownWPF
         private IEnumerable<IMarkdownElement> ParseMarkdigDocument(MarkdownDocument document)
         {
             Console.Clear();
-            ICollection<IMarkdownElement> elements = [];
+            IList<IRegion> elements = [];
 
             foreach (var mdItem in document)
             {
-                if (mdItem is HeadingBlock headingBlock)
-                {
-                    elements.Add(GetHeader(headingBlock));
-                }
-                if (mdItem is ParagraphBlock paragraphBlock)
-                {
-                    var inlinesResult = GetInlines(paragraphBlock.Inline);
-
-                    IList<Models.Inlines.IInline> inlines = [];
-                    foreach (var inline in inlinesResult)
-                    {
-                        if (inline is InlineLink inlineLink && inlineLink.IsImage)
-                        {
-                            if (inlines.Count > 0)
-                            {
-                                elements.Add(new ParagraphRegion(inlines));
-                                inlines.Clear();
-                }
-
-                            elements.Add(new ImageRegion(inlineLink));
-
-                            continue;
-                        }
-
-                        inlines.Add(inline);
-                    }
-
-                    if (inlines.Count > 0)
-                    {
-                        elements.Add(new ParagraphRegion(inlines));
-                    }
-                }
-                if (mdItem is CodeBlock codeBlock) 
-                {
-                    elements.Add(ToCodeRegion(codeBlock));
-                }
-                if (mdItem is ThematicBreakBlock thematicBreakBlock)
-                {
-                    elements.Add(new ThematicBreakRegion(thematicBreakBlock.ThematicChar, thematicBreakBlock.ThematicCharCount));
-            }
+                GetMarkdownElementByType(mdItem, elements);
             }
 
             return elements;
+        }
+
+        private void GetMarkdownElementByType(Block mdItem, IList<IRegion> elements) 
+        {
+            if (mdItem is HeadingBlock headingBlock)
+            {
+                elements.Add(GetHeader(headingBlock));
+            }
+            else if (mdItem is ParagraphBlock paragraphBlock)
+            {
+                var inlinesResult = GetInlines(paragraphBlock.Inline);
+
+                IList<Models.Inlines.IInline> inlines = [];
+                foreach (var inline in inlinesResult)
+                {
+                    if (inline is InlineLink inlineLink && inlineLink.IsImage)
+                    {
+                        if (inlines.Count > 0)
+                        {
+                            elements.Add(new ParagraphRegion(inlines));
+                            inlines.Clear();
+                        }
+
+                        elements.Add(new ImageRegion(inlineLink));
+
+                        continue;
+                    }
+
+                    inlines.Add(inline);
+                }
+
+                if (inlines.Count > 0)
+                {
+                    elements.Add(new ParagraphRegion(inlines));
+                }
+            }
+            else if (mdItem is CodeBlock codeBlock)
+            {
+                elements.Add(ToCodeRegion(codeBlock));
+            }
+            else if (mdItem is ThematicBreakBlock thematicBreakBlock)
+            {
+                elements.Add(new ThematicBreakRegion(thematicBreakBlock.ThematicChar, thematicBreakBlock.ThematicCharCount));
+            }
+            else if (mdItem is QuoteBlock quoteBlock) 
+            {
+                elements.Add(GetQuoteRegion(quoteBlock));
+            }
+        }
+
+        private IRegion GetQuoteRegion(QuoteBlock quoteBlock) 
+        {
+            var region = new QuoteRegion();
+
+            foreach (var i in quoteBlock) 
+            {
+                GetMarkdownElementByType(i, region.Value);
+            }
+
+             return region;
         }
 
         /// <summary>
@@ -118,7 +140,7 @@ namespace MarkdownWPF
                 return new Paragraph("\n");
             }
 
-            if (inline is CodeInline codeInline) 
+            if (inline is CodeInline codeInline)
             {
                 return new InlineCode(codeInline.Content);
             }
@@ -127,7 +149,7 @@ namespace MarkdownWPF
             {
                 // TODO: URL must be file path
                 return new InlineLink(GetTextFromInline(linkInline.FirstChild), linkInline.Url, linkInline.IsImage);
-        }
+            }
 
             if (inline is LinkDelimiterInline linkDelimiterInline)
             {
@@ -201,7 +223,7 @@ namespace MarkdownWPF
                 if (inlines == null)
                 {
                     inlines = new List<Models.Inlines.IInline>();
-        }
+                }
 
                 inlines.Add(new InlineLink(GetTextFromInline(firstLinkInline.FirstChild), firstLinkInline.Url, firstLinkInline.IsImage));
             }
@@ -225,7 +247,7 @@ namespace MarkdownWPF
         /// </summary>
         /// <param name="headingBlock">HeadingBlock</param>
         /// <returns>Heading</returns>
-        public IMarkdownElement GetHeader(HeadingBlock headingBlock)
+        public HeadingRegion GetHeader(HeadingBlock headingBlock)
         {
             var inlines = new List<Models.Inlines.IInline>();
 
@@ -292,7 +314,7 @@ namespace MarkdownWPF
         {
             var codeRegion = new CodeRegion();
 
-            if (codeBlock.Lines.Lines == null) 
+            if (codeBlock.Lines.Lines == null)
             {
                 return codeRegion;
             }
@@ -303,9 +325,9 @@ namespace MarkdownWPF
             }
 
             var tmpElements = codeRegion.Value;
-            for (var i = tmpElements.Count - 1; i > 0; i--) 
+            for (var i = tmpElements.Count - 1; i > 0; i--)
             {
-                if (!string.IsNullOrEmpty(tmpElements[i].Text)) 
+                if (!string.IsNullOrEmpty(tmpElements[i].Text))
                 {
                     break;
                 }
@@ -338,6 +360,59 @@ namespace MarkdownWPF
             }
 
             return false;
+        }
+
+        public ListRegion ToListRegion(ListBlock listBlockRoot)
+        {
+            var listRegion = new ListRegion();
+
+            /*
+           
+            [ListItemBlock]
+            + Create a list by starting a line with `+`, `-`, or `*`
+            
+            [ListItemBlock]
+            [ParagraphBlock]
+            + Sub-lists are made by indenting 2 spaces:
+                [ListBlock]
+                - Marker character change forces new list start:
+                    * Ac tristique libero volutpat at
+                    + Facilisis in pretium nisl aliquet
+                    - Nulla volutpat aliquam velit
+            
+            [ListItemBlock]
+            [ParagraphBlock]
+            + Very easy!
+
+             */
+
+            foreach (ListItemBlock listItemBlock in listBlockRoot)
+            {
+                //foreach (var content in listItemBlock) 
+                //{
+                //    Console.WriteLine(content.GetType());
+
+                //    if (content is ParagraphBlock paragraphBlock) 
+                //    {
+                //        listRegion.Elements.Add(
+                //            new ParagraphRegion(GetInlines(paragraphBlock.Inline)));
+                //    }
+
+                //    if (content is ListBlock listBlock) 
+                //    {
+
+                //    }
+                //}
+                //foreach (ParagraphBlock pb in i) 
+                //{
+                //    // order
+                //    // order delimeter
+                //    Console.WriteLine(pb);
+                //    //listRegion.Elements.Add(new ParagraphRegion(GetInlines(pb.Inline)));
+                //}
+            }
+
+            return listRegion;
         }
     }
 }
