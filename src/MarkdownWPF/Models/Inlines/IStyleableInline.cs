@@ -1,11 +1,13 @@
-﻿namespace MarkdownWPF.Models.Inlines
+﻿using MarkdownWPF.Models.Base;
+
+namespace MarkdownWPF.Models.Inlines
 {
-    public interface IStyleableInline
+    public interface IStyleableInline : IInline
     {
         public EmphasisWeight Weight { get; }
-        public IList<EmphasisDecorations> Decorations { get; }
+        public ISet<EmphasisDecorations> Decorations { get; }
+        public ISet<EmphasisTypography> TypographyElements { get; }
         public EmphasisStyle Style { get; }
-        public IList<EmphasisTypography> TypographyElements { get; }
         public bool HasHighlight { get; }
     }
 }

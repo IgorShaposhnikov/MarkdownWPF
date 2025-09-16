@@ -15,39 +15,16 @@ namespace MarkdownWPF.Renderer
                 Text = inline.Text
             };
 
-            if (inline is Emphasis emphasis)
+            if (inline is IStyleableInline emphasis)
             {
-                if (emphasis.Style == EmphasisStyle.Italic)
-                {
-                    run.FontStyle = FontStyles.Italic;
-                }
-
-                if (emphasis.Weight == EmphasisWeight.Bold)
-                {
-                    run.FontWeight = FontWeights.Bold;
-                }
-
-                if (emphasis.Decorations.Count > 0)
-                {
-                    TextDecorationCollection decorations = new();
-
-                    foreach (var decoration in emphasis.Decorations)
-                    {
-                        decorations.Add(GetDecorationByType(decoration));
-                    }
-
-                    run.TextDecorations = decorations;
-                }
-
-                if (emphasis.HasHighlight)
-                {
-                    run.Background = new SolidColorBrush(Colors.LightCyan);
-                }
-
-                Console.WriteLine("All Text: " + run.Text);
+                run = GenerateStyleableBlock(run, emphasis);
             }
-            else if (inline is InlineCode)
+            else if (inline is InlineCode inlineCode)
             {
+               if (inlineCode.ParentInlinesStyle != null)
+                {
+                    run = GenerateStyleableBlock(run, inlineCode.ParentInlinesStyle);
+                }
                 // Visible "padding"
                 run.Text = $" {run.Text} ";
                 run.Background = new BrushConverter().ConvertFrom("#f9f2f4") as SolidColorBrush;
@@ -68,6 +45,11 @@ namespace MarkdownWPF.Renderer
                     }
                 };
 
+                if (inlineLink.ParentInlinesStyle != null)
+                {
+                    run = GenerateStyleableBlock(run, inlineLink.ParentInlinesStyle);
+                }
+
                 hyperLink.Inlines.Add(run);
                 return hyperLink;
             }
@@ -83,7 +65,56 @@ namespace MarkdownWPF.Renderer
                 return [RenderInline(container)];
             }
 
-            return container.Inlines.Select(RenderInline);
+            var res = new List<IInline>();
+            foreach (var i in container.Inlines)
+            {
+                if (i is InlineLink inlineLink)
+                {
+                    inlineLink.ParentInlinesStyle = (Emphasis)container;
+                    res.Add(inlineLink);
+                }
+                else if (i is InlineCode inlineCode)
+                {
+                    inlineCode.ParentInlinesStyle = (Emphasis)container;
+                    res.Add(inlineCode);
+                }
+            }
+
+            return res.Select(RenderInline);
+        }
+
+        private Run GenerateStyleableBlock(Run run, IStyleableInline emphasis)
+        {
+            if (emphasis.Style == EmphasisStyle.Italic)
+            {
+                run.FontStyle = FontStyles.Italic;
+            }
+
+            if (emphasis.Weight == EmphasisWeight.Bold)
+            {
+                run.FontWeight = FontWeights.Bold;
+            }
+
+            if (emphasis.Decorations.Count > 0)
+            {
+                TextDecorationCollection decorations = new();
+
+                foreach (var decoration in emphasis.Decorations)
+                {
+                    decorations.Add(GetDecorationByType(decoration));
+                }
+
+                run.TextDecorations = decorations;
+            }
+
+            if (emphasis.HasHighlight)
+            {
+                run.Background = new SolidColorBrush(Colors.LightCyan);
+            }
+
+            Console.WriteLine("All Text: " + run.Text);
+
+            return run;
         }
 
         private TextDecorationCollection GetDecorationByType(EmphasisDecorations decoration)

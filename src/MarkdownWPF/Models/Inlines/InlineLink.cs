@@ -11,7 +11,7 @@
         /// <summary>
         /// The result of concantention parent style blocks.
         /// </summary>
-        public IStyleableInline? ParentInlinesStyle { get; }
+        public IStyleableInline? ParentInlinesStyle { get; set; }
 
         public InlineLink(string text, string url, bool isImage, IStyleableInline? parentInlinesStyles = null)
         {

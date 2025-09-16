@@ -6,7 +6,7 @@
         /// <summary>
         /// The result of concantention parent style regions.
         /// </summary>
-        public IStyleableInline? ParentInlinesStyle { get; }
+        public IStyleableInline? ParentInlinesStyle { get; set; }
 
         public InlineCode(string text, IStyleableInline? parentInlinesStyle = null)
         {

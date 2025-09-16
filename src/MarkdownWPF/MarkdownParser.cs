@@ -110,7 +110,7 @@ namespace MarkdownWPF
 
             if (inline is EmphasisInline emphasisInline)
             {
-                return TraverseEmphasis(emphasisInline, [], [], text: GetTextFromInline(emphasisInline));
+                return TraverseEmphasis(emphasisInline, new HashSet<EmphasisTypography>(), new HashSet<EmphasisDecorations>(), text: GetTextFromInline(emphasisInline));
             }
 
             if (inline is LineBreakInline lineBreakInline)
@@ -146,8 +146,8 @@ namespace MarkdownWPF
         // 
 
         public Emphasis TraverseEmphasis(EmphasisInline emphasisInline,
-            List<EmphasisTypography> typographyElements,
-            IList<EmphasisDecorations> decorations,
+            ISet<EmphasisTypography> typographyElements,
+            ISet<EmphasisDecorations> decorations,
             EmphasisStyle style = EmphasisStyle.Normal,
             EmphasisWeight weight = EmphasisWeight.Normal,
             bool hasHighlight = false,
@@ -204,6 +204,16 @@ namespace MarkdownWPF
         }
 
                 inlines.Add(new InlineLink(GetTextFromInline(firstLinkInline.FirstChild), firstLinkInline.Url, firstLinkInline.IsImage));
+            }
+
+            if (emphasisInline.FirstChild is CodeInline codeInline)
+            {
+                if (inlines == null)
+                {
+                    inlines = new List<Models.Inlines.IInline>();
+                }
+
+                inlines.Add(new InlineCode(codeInline.Content));
             }
 
             return new Emphasis(text, typographyElements, decorations, weight, style, hasHighlight, inlines);
