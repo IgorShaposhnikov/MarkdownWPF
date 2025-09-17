@@ -4,6 +4,7 @@ using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
 using MarkdownWPF.Models.Inlines;
 using MarkdownWPF.Models.Regions;
+using System.Windows;
 
 namespace MarkdownWPF
 {
@@ -35,13 +36,13 @@ namespace MarkdownWPF
 
             foreach (var mdItem in document)
             {
-                GetMarkdownElementByType(mdItem, elements);
+                GetRegionByType(mdItem, elements);
             }
 
             return elements;
         }
 
-        private void GetMarkdownElementByType(Block mdItem, IList<IRegion> elements) 
+        private void GetRegionByType(Block mdItem, IList<IRegion> elements)
         {
             if (mdItem is HeadingBlock headingBlock)
             {
@@ -83,22 +84,18 @@ namespace MarkdownWPF
             {
                 elements.Add(new ThematicBreakRegion(thematicBreakBlock.ThematicChar, thematicBreakBlock.ThematicCharCount));
             }
-            else if (mdItem is QuoteBlock quoteBlock) 
+            else if (mdItem is QuoteBlock quoteBlock)
             {
                 elements.Add(GetQuoteRegion(quoteBlock));
             }
-        }
-
-        private IRegion GetQuoteRegion(QuoteBlock quoteBlock) 
-        {
-            var region = new QuoteRegion();
-
-            foreach (var i in quoteBlock) 
+            else if (mdItem is ListBlock listBlock)
             {
-                GetMarkdownElementByType(i, region.Value);
+                elements.Add(ToListRegion(listBlock));
             }
-
-             return region;
+            else if (mdItem is ListItemBlock listItemBlock) 
+            {
+                elements.Add(ToListItemRegion(listItemBlock));
+            }
         }
 
         /// <summary>
@@ -338,6 +335,17 @@ namespace MarkdownWPF
             return codeRegion;
         }
 
+        public QuoteRegion GetQuoteRegion(QuoteBlock quoteBlock)
+        {
+            var region = new QuoteRegion();
+
+            foreach (var i in quoteBlock)
+            {
+                GetRegionByType(i, region.Value);
+            }
+
+            return region;
+        }
         public static bool CheckURLValid(string url)
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -366,53 +374,39 @@ namespace MarkdownWPF
         {
             var listRegion = new ListRegion();
 
-            /*
-           
-            [ListItemBlock]
-            + Create a list by starting a line with `+`, `-`, or `*`
-            
-            [ListItemBlock]
-            [ParagraphBlock]
-            + Sub-lists are made by indenting 2 spaces:
-                [ListBlock]
-                - Marker character change forces new list start:
-                    * Ac tristique libero volutpat at
-                    + Facilisis in pretium nisl aliquet
-                    - Nulla volutpat aliquam velit
-            
-            [ListItemBlock]
-            [ParagraphBlock]
-            + Very easy!
-
-             */
-
             foreach (ListItemBlock listItemBlock in listBlockRoot)
             {
-                //foreach (var content in listItemBlock) 
-                //{
-                //    Console.WriteLine(content.GetType());
+                var listItemRegions = new List<IRegion>();
+                GetRegionByType(listItemBlock, listItemRegions);
 
-                //    if (content is ParagraphBlock paragraphBlock) 
-                //    {
-                //        listRegion.Elements.Add(
-                //            new ParagraphRegion(GetInlines(paragraphBlock.Inline)));
-                //    }
-
-                //    if (content is ListBlock listBlock) 
-                //    {
-
-                //    }
-                //}
-                //foreach (ParagraphBlock pb in i) 
-                //{
-                //    // order
-                //    // order delimeter
-                //    Console.WriteLine(pb);
-                //    //listRegion.Elements.Add(new ParagraphRegion(GetInlines(pb.Inline)));
-                //}
+                foreach (ListItemRegion i in listItemRegions) 
+                {
+                    listRegion.Value.Add(i);
+                }
             }
 
             return listRegion;
+        }
+
+        private ListItemRegion ToListItemRegion(ListItemBlock listItemBlock)
+        {
+            var parent = (listItemBlock.Parent as ListBlock);
+
+            var listItemRegion = new ListItemRegion(new List<IRegion>())
+            {
+                IsOrdered = parent.IsOrdered,
+                BulletType = parent.BulletType,
+                OrderedStart = parent.OrderedStart,
+                OrderedDelimiter = parent.IsOrdered ? parent.OrderedDelimiter : char.MinValue,
+                Order = listItemBlock.Order
+            };
+
+            foreach (var i in listItemBlock)
+            {
+                GetRegionByType(i, listItemRegion.Value);
+            }
+
+            return listItemRegion;
         }
     }
 }
