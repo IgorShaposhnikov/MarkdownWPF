@@ -1,4 +1,5 @@
 ﻿using Markdig;
+using Markdig.Extensions.Tables;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
@@ -92,9 +93,13 @@ namespace MarkdownWPF
             {
                 elements.Add(ToListRegion(listBlock));
             }
-            else if (mdItem is ListItemBlock listItemBlock) 
+            else if (mdItem is ListItemBlock listItemBlock)
             {
                 elements.Add(ToListItemRegion(listItemBlock));
+            }
+            else if (mdItem is Table table) 
+            {
+                elements.Add(ToTableRegion(table));
             }
         }
 
@@ -407,6 +412,42 @@ namespace MarkdownWPF
             }
 
             return listItemRegion;
+        }
+
+        private TableRegion ToTableRegion(Table table)
+        {
+            var tableRegion = new TableRegion();
+
+            foreach (TableRow row in table)
+            {
+                tableRegion.Value.Add(ToTableRowRegion(row));
+            }
+
+            return tableRegion;
+        }
+
+        private TableRowRegion ToTableRowRegion(TableRow row)
+        {
+            var rowRegion = new TableRowRegion();
+
+            foreach (TableCell cell in row)
+            {
+                rowRegion.Value.Add(ToTableCellRegion(cell));
+            }
+
+            return rowRegion;
+        }
+
+        private TableCellRegion ToTableCellRegion(TableCell tableCell)
+        {
+            var cellRegion = new TableCellRegion();
+
+            foreach (var i in tableCell)
+            {
+                GetRegionByType(i, cellRegion.Value);
+            }
+
+            return cellRegion;
         }
     }
 }

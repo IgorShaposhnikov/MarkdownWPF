@@ -165,4 +165,27 @@
             </Grid>
         </Border>
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:TableRegion}">
+        <ItemsControl ItemsSource="{Binding Value}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:TableRowRegion}">
+        <ItemsControl ItemsSource="{Binding Value}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="1" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:TableCellRegion}">
+        <Border
+            Padding="5"
+            BorderBrush="Gray"
+            BorderThickness="1,1,1,1">
+            <ItemsControl ItemsSource="{Binding Value}" />
+        </Border>
+    </DataTemplate>
 </ResourceDictionary>
