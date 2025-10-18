@@ -4,9 +4,12 @@ namespace MarkdownWPF.Models.Regions
 {
     public class ImageRegion : RegionBase<InlineLink>
     {
-        public ImageRegion(InlineLink link)
+        public string Title { get; }
+
+        public ImageRegion(Image image)
         {
-            Value = link;
+            Value = image;
+            Title = image.Text;
         }
     }
 }

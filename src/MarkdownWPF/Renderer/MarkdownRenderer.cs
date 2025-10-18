@@ -27,6 +27,7 @@ namespace MarkdownWPF.Renderer
                 }
                 // Visible "padding"
                 run.Text = $" {run.Text} ";
+                // TODO: Need add a way to styling blocks;
                 run.Background = new BrushConverter().ConvertFrom("#f9f2f4") as SolidColorBrush;
                 run.Foreground = new BrushConverter().ConvertFrom("#c7254e") as SolidColorBrush;
             }

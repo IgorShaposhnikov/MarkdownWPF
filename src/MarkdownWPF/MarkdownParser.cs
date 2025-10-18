@@ -64,7 +64,16 @@ namespace MarkdownWPF
                             inlines.Clear();
                         }
 
-                        elements.Add(new ImageRegion(inlineLink));
+                        var image = inlineLink as Image;
+
+                        if (string.IsNullOrEmpty(image.AdditionalUrl))
+                        {
+                            elements.Add(new ImageRegion(image));
+                        }
+                        else
+                        {
+                            elements.Add(new ClickableImageRegion(image));
+                        }
 
                         continue;
                     }
@@ -97,7 +106,7 @@ namespace MarkdownWPF
             {
                 elements.Add(ToListItemRegion(listItemBlock));
             }
-            else if (mdItem is Table table) 
+            else if (mdItem is Table table)
             {
                 elements.Add(ToTableRegion(table));
             }
@@ -149,8 +158,21 @@ namespace MarkdownWPF
 
             if (inline is LinkInline linkInline)
             {
-                // TODO: URL must be file path
-                return new InlineLink(GetTextFromInline(linkInline.FirstChild), linkInline.Url, linkInline.IsImage);
+                // clickable image
+                if (linkInline.FirstChild is LinkInline childLink && childLink.IsImage)
+                {                    var imageUrl = childLink.Url;
+                    var imageTitle = childLink.Title;
+                    var addtionalUrl = linkInline.Url;
+                    return new Image(imageTitle, imageUrl, addtionalUrl: addtionalUrl);
+                }
+
+                // image
+                if (linkInline.IsImage)
+                {
+                    return new Image(linkInline.Title, linkInline.Url);
+                }
+
+                return new InlineLink(GetTextFromInline(linkInline), linkInline.Url, linkInline.IsImage);
             }
 
             if (inline is LinkDelimiterInline linkDelimiterInline)
@@ -384,7 +406,7 @@ namespace MarkdownWPF
                 var listItemRegions = new List<IRegion>();
                 GetRegionByType(listItemBlock, listItemRegions);
 
-                foreach (ListItemRegion i in listItemRegions) 
+                foreach (ListItemRegion i in listItemRegions)
                 {
                     listRegion.Value.Add(i);
                 }

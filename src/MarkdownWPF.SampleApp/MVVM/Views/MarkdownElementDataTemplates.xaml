@@ -11,8 +11,9 @@
     <!--  Here datatemplates  -->
 
     <renderer:MarkdownRenderer x:Key="MdRenderer" />
-    <sys:Double x:Key="DefaultTextFontSize">18.0</sys:Double>
+    <sys:Double x:Key="DefaultTextFontSize">14.0</sys:Double>
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <converters:StringToImageConverter x:Key="StringToImageConverter" />
 
     <DataTemplate DataType="{x:Type regions:ParagraphRegion}">
         <TextBlock
@@ -84,15 +85,30 @@
             BorderThickness="0,1.5,0,0" />
     </DataTemplate>
 
-    <converters:StringToImageConverter x:Key="StringToImageConverter" />
-
     <DataTemplate DataType="{x:Type regions:ImageRegion}">
         <Image
-            HorizontalAlignment="Left"
             CacheMode="BitmapCache"
             Source="{Binding Value.Url, Converter={StaticResource StringToImageConverter}}"
             Stretch="Uniform"
-            StretchDirection="DownOnly" />
+            StretchDirection="DownOnly"
+            ToolTip="{Binding Title}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ClickableImageRegion}">
+        <Button
+            extensions:ButtonExtensions.Url="{Binding AddtionalUrl}"
+            Cursor="Hand"
+            ToolTip="{Binding Title}">
+            <Button.Template>
+                <ControlTemplate>
+                    <Image
+                        CacheMode="BitmapCache"
+                        Source="{Binding Value.Url, Converter={StaticResource StringToImageConverter}}"
+                        Stretch="Uniform"
+                        StretchDirection="DownOnly" />
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type regions:QuoteRegion}">
