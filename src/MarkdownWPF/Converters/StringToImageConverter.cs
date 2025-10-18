@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using System.Net.Cache;
+using System.IO;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
 
@@ -26,7 +26,14 @@ namespace MarkdownWPF.Converters
                     return new BitmapImage();
                 }
 
+                // if url is directory path
+                if (Directory.Exists(url)) 
+                {
+                    return new BitmapImage();
+                }
+
                 var bitmapImage = new BitmapImage();
+
                 bitmapImage.BeginInit();
                 bitmapImage.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
                 bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
