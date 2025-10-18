@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:MarkdownWPF.Converters;assembly=MarkdownWPF"
     xmlns:extensions="clr-namespace:MarkdownWPF.Extensions;assembly=MarkdownWPF"
     xmlns:models="clr-namespace:MarkdownWPF.Models;assembly=MarkdownWPF"
     xmlns:regions="clr-namespace:MarkdownWPF.Models.Regions;assembly=MarkdownWPF"
@@ -10,7 +11,7 @@
     <!--  Here datatemplates  -->
 
     <renderer:MarkdownRenderer x:Key="MdRenderer" />
-    <sys:Double x:Key="DefaultTextFontSize">14.0</sys:Double>
+    <sys:Double x:Key="DefaultTextFontSize">18.0</sys:Double>
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
     <DataTemplate DataType="{x:Type regions:ParagraphRegion}">
@@ -83,9 +84,13 @@
             BorderThickness="0,1.5,0,0" />
     </DataTemplate>
 
+    <converters:StringToImageConverter x:Key="StringToImageConverter" />
+
     <DataTemplate DataType="{x:Type regions:ImageRegion}">
         <Image
-            Source="{Binding Value.Url}"
+            HorizontalAlignment="Left"
+            CacheMode="BitmapCache"
+            Source="{Binding Value.Url, Converter={StaticResource StringToImageConverter}}"
             Stretch="Uniform"
             StretchDirection="DownOnly" />
     </DataTemplate>
