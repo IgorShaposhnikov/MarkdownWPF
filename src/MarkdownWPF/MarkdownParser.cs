@@ -148,7 +148,12 @@ namespace MarkdownWPF
 
             if (inline is LineBreakInline lineBreakInline)
             {
+                if (lineBreakInline.IsHard) 
+                {
                 return new Paragraph("\n");
+            }
+
+                return new Paragraph("");
             }
 
             if (inline is CodeInline codeInline)
