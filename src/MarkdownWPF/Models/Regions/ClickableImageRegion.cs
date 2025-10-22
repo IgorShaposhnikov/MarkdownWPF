@@ -6,7 +6,7 @@ namespace MarkdownWPF.Models.Regions
     {
         public string? AddtionalUrl { get; }
 
-        public ClickableImageRegion(Image image) : base(image)
+        public ClickableImageRegion(InlineImage image) : base(image)
         {
             AddtionalUrl = image.AdditionalUrl;
         }

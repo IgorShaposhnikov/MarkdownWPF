@@ -5,6 +5,7 @@ using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
 using MarkdownWPF.Models.Inlines;
 using MarkdownWPF.Models.Regions;
+using System.Diagnostics;
 using System.Windows;
 
 namespace MarkdownWPF
@@ -32,7 +33,6 @@ namespace MarkdownWPF
         /// <returns>Collection of IMarkdownElements</returns>
         private IEnumerable<IMarkdownElement> ParseMarkdigDocument(MarkdownDocument document)
         {
-            Console.Clear();
             IList<IRegion> elements = [];
 
             foreach (var mdItem in document)
@@ -45,6 +45,7 @@ namespace MarkdownWPF
 
         private void GetRegionByType(Block mdItem, IList<IRegion> elements)
         {
+            Debug.WriteLine(mdItem.GetType());
             if (mdItem is HeadingBlock headingBlock)
             {
                 elements.Add(GetHeader(headingBlock));
@@ -52,27 +53,21 @@ namespace MarkdownWPF
             else if (mdItem is ParagraphBlock paragraphBlock)
             {
                 var inlinesResult = GetInlines(paragraphBlock.Inline);
-
                 IList<Models.Inlines.IInline> inlines = [];
+
                 foreach (var inline in inlinesResult)
                 {
                     if (inline is InlineLink inlineLink && inlineLink.IsImage)
                     {
-                        if (inlines.Count > 0)
-                        {
-                            elements.Add(new ParagraphRegion(inlines));
-                            inlines.Clear();
-                        }
-
-                        var image = inlineLink as Image;
+                        var image = inlineLink as InlineImage;
 
                         if (string.IsNullOrEmpty(image.AdditionalUrl))
                         {
-                            elements.Add(new ImageRegion(image));
+                            inlines.Add(image);
                         }
                         else
                         {
-                            elements.Add(new ClickableImageRegion(image));
+                            inlines.Add(image);
                         }
 
                         continue;
@@ -135,7 +130,7 @@ namespace MarkdownWPF
         /// <exception cref="NotSupportedException">Unsupported inline type</exception>
         public Models.Inlines.IInline GetInline(Inline inline)
         {
-            Console.WriteLine(inline.GetType());
+            Debug.WriteLine(inline.GetType());
             if (inline is LiteralInline literalInline)
             {
                 return new Paragraph(literalInline.Content.ToString());
@@ -148,12 +143,12 @@ namespace MarkdownWPF
 
             if (inline is LineBreakInline lineBreakInline)
             {
-                if (lineBreakInline.IsHard) 
+                if (lineBreakInline.IsHard)
                 {
-                return new Paragraph("\n");
-            }
+                    return new Paragraph("\n");
+                }
 
-                return new Paragraph("");
+                return new Paragraph(" ");
             }
 
             if (inline is CodeInline codeInline)
@@ -165,16 +160,17 @@ namespace MarkdownWPF
             {
                 // clickable image
                 if (linkInline.FirstChild is LinkInline childLink && childLink.IsImage)
-                {                    var imageUrl = childLink.Url;
+                {
+                    var imageUrl = childLink.Url;
                     var imageTitle = childLink.Title;
                     var addtionalUrl = linkInline.Url;
-                    return new Image(imageTitle, imageUrl, addtionalUrl: addtionalUrl);
+                    return new InlineImage(imageTitle, imageUrl, addtionalUrl: addtionalUrl);
                 }
 
                 // image
                 if (linkInline.IsImage)
                 {
-                    return new Image(linkInline.Title, linkInline.Url);
+                    return new InlineImage(linkInline.Title, linkInline.Url);
                 }
 
                 return new InlineLink(GetTextFromInline(linkInline), linkInline.Url, linkInline.IsImage);
@@ -182,7 +178,7 @@ namespace MarkdownWPF
 
             if (inline is LinkDelimiterInline linkDelimiterInline)
             {
-                Console.WriteLine(inline);
+                // TODO: ???
                 return new Paragraph("");
             }
 
@@ -203,7 +199,7 @@ namespace MarkdownWPF
             EmphasisWeight weight = EmphasisWeight.Normal,
             bool hasHighlight = false,
             string text = "",
-            IList<Models.Inlines.IInline> inlines = null)
+            IList<Models.Inlines.IInline>? inlines = null)
         {
             if (emphasisInline.DelimiterChar == '*' || emphasisInline.DelimiterChar == '_')
             {

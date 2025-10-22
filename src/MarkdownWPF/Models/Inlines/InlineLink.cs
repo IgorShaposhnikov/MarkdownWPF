@@ -22,14 +22,14 @@
         }
     }
 
-    public class Image : InlineLink
+    public class InlineImage : InlineLink
     {
         /// <summary>
         /// Url for clickable image
         /// </summary>
         public string? AdditionalUrl { get; }
 
-        public Image(string text, string url, string? addtionalUrl = null, IStyleableInline? parentInlinesStyles = null) : base(text, url, true, parentInlinesStyles)
+        public InlineImage(string text, string url, string? addtionalUrl = null, IStyleableInline? parentInlinesStyles = null) : base(text, url, true, parentInlinesStyles)
         {
             AdditionalUrl = addtionalUrl;
         }

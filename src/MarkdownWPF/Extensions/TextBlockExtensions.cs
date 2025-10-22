@@ -1,8 +1,14 @@
 ﻿using MarkdownWPF.Models.Inlines;
+using MarkdownWPF.Models.Regions;
 using MarkdownWPF.Renderer;
 using System.Collections;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace MarkdownWPF.Extensions
 {
@@ -17,7 +23,7 @@ namespace MarkdownWPF.Extensions
 
         public static object GetSource(DependencyObject obj)
         {
-            return (object)obj.GetValue(SourceProperty);
+            return obj.GetValue(SourceProperty);
         }
 
         public static void SetSource(DependencyObject obj, object value)
@@ -45,6 +51,8 @@ namespace MarkdownWPF.Extensions
 
         private static void OnSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            // TODO: Везде где можно обойтись без Inlines использовать TextBox для возможности копирования текста
+            // Например в блоках кода (не inline)
             if (d is not TextBlock textBlock) return;
 
             textBlock.Inlines.Clear();
@@ -62,7 +70,7 @@ namespace MarkdownWPF.Extensions
 
             if (source is string text)
             {
-                textBlock.Inlines.Add(render.RenderInline(new Paragraph(text)));
+                textBlock.Inlines.Add(render.RenderInline(new Models.Inlines.Paragraph(text)));
             }
             else if (source is IEnumerable collection)
             {
@@ -75,6 +83,12 @@ namespace MarkdownWPF.Extensions
                             render.RenderInlineContainer(container)
                             );
                     }
+                    else if (item is InlineImage img)
+                    {
+                        ImageRegion imageRegion = string.IsNullOrEmpty(img.AdditionalUrl) ? new ImageRegion(img) : new ClickableImageRegion(img);
+                        var inlineUIContainer = new System.Windows.Documents.InlineUIContainer(GetImage(imageRegion));
+                        textBlock.Inlines.Add(inlineUIContainer);
+                    }
                     else if (item is IInline mdElement)
                     {
                         // Get renderable inline WPF element (like Run)
@@ -84,6 +98,69 @@ namespace MarkdownWPF.Extensions
                             textBlock.Inlines.Add(inline);
                         }
                     }
+                }
+            }
+        }
+
+        private static Image GetImage(ImageRegion dataContext)
+        {
+            var image = new Image();
+
+            // Set MaxHeight with a Binding
+            Binding maxHeightBinding = new("Height");
+            image.SetBinding(FrameworkElement.MaxHeightProperty, maxHeightBinding);
+
+            // Set Source with a Binding and Converter
+            // The converter needs to be retrieved from your application resources
+            IValueConverter stringToImageConverter = (IValueConverter)Application.Current.FindResource("StringToImageConverter");
+            Binding sourceBinding = new()
+            {
+                Converter = stringToImageConverter
+            };
+            image.SetBinding(Image.SourceProperty, sourceBinding);
+
+            // Set other properties that do not require bindings
+            image.DataContext = dataContext;
+            image.CacheMode = new BitmapCache();
+            image.Stretch = Stretch.Uniform;
+            image.StretchDirection = StretchDirection.DownOnly;
+
+            if (dataContext is ClickableImageRegion clickableImage)
+            {
+                image.MouseLeftButtonDown += (s, e) =>
+                {
+                    OpenUrl(clickableImage.AddtionalUrl);
+                };
+            }
+
+            return image;
+        }
+
+        private static void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                // https://github.com/dotnet/corefx/issues/10361
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    url = url.Replace("&", "^&");
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    Process.Start("xdg-open", url);
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    Process.Start("open", url);
+                }
+                else
+                {
+                    throw;
                 }
             }
         }

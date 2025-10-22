@@ -113,7 +113,7 @@ namespace MarkdownWPF.Renderer
                 run.Background = new SolidColorBrush(Colors.LightCyan);
             }
 
-            Console.WriteLine("All Text: " + run.Text);
+            Debug.WriteLine("All Text: " + run.Text);
 
             return run;
         }
