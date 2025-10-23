@@ -1,0 +1,215 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:MarkdownWPF.Converters"
+    xmlns:extensions="clr-namespace:MarkdownWPF.Extensions"
+    xmlns:models="clr-namespace:MarkdownWPF.Models"
+    xmlns:regions="clr-namespace:MarkdownWPF.Models.Regions"
+    xmlns:renderer="clr-namespace:MarkdownWPF.Renderer"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!--  Here datatemplates  -->
+
+    <renderer:MarkdownRenderer x:Key="MdRenderer" />
+    <sys:Double x:Key="DefaultTextFontSize">14.0</sys:Double>
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    <converters:StringToImageConverter x:Key="StringToImageConverter" />
+
+    <DataTemplate DataType="{x:Type regions:ParagraphRegion}">
+        <TextBlock
+            Margin="0,10,0,5"
+            extensions:TextBlockExtensions.MarkdownRenderer="{StaticResource MdRenderer}"
+            extensions:TextBlockExtensions.Source="{Binding Value}"
+            FontSize="{DynamicResource DefaultTextFontSize}"
+            TextWrapping="WrapWithOverflow" />
+    </DataTemplate>
+
+
+    <DataTemplate DataType="{x:Type regions:HeadingRegion}">
+        <TextBlock
+            Margin="0,10,0,5"
+            extensions:TextBlockExtensions.MarkdownRenderer="{StaticResource MdRenderer}"
+            extensions:TextBlockExtensions.Source="{Binding Value}"
+            TextWrapping="WrapWithOverflow">
+
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="FontSize" Value="40" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Level}" Value="2">
+                            <Setter Property="FontSize" Value="32" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="3">
+                            <Setter Property="FontSize" Value="24" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="4">
+                            <Setter Property="FontSize" Value="16" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="5">
+                            <Setter Property="FontSize" Value="14" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="6">
+                            <Setter Property="FontSize" Value="12" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:CodeRegion}">
+        <!--  TODO: Add Code container with syntax support (or just leave it :) )  -->
+        <Border
+            Padding="9.5"
+            Background="#f8f8f8"
+            BorderBrush="#333"
+            BorderThickness="1"
+            CornerRadius="5">
+            <TextBox
+                Background="Transparent"
+                BorderThickness="0"
+                FontSize="{StaticResource DefaultTextFontSize}"
+                Foreground="#333"
+                IsReadOnly="True"
+                IsUndoEnabled="False"
+                SpellCheck.IsEnabled="False"
+                Text="{Binding Value, Mode=OneWay}"
+                TextWrapping="Wrap"
+                UndoLimit="0" />
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ThematicBreakRegion}">
+        <Border
+            Height="2"
+            Margin="0,20"
+            BorderBrush="#333"
+            BorderThickness="0,1.5,0,0" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ImageRegion}">
+        <Image
+            MaxHeight="{Binding Height}"
+            CacheMode="BitmapCache"
+            Source="{Binding Converter={StaticResource StringToImageConverter}}"
+            Stretch="Uniform"
+            StretchDirection="DownOnly"
+            ToolTip="{Binding Title}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ClickableImageRegion}">
+        <Button
+            extensions:ButtonExtensions.Url="{Binding AddtionalUrl}"
+            Cursor="Hand"
+            ToolTip="{Binding Title}">
+            <Button.Template>
+                <ControlTemplate>
+                    <Image
+                        CacheMode="BitmapCache"
+                        Source="{Binding Value.Url, Converter={StaticResource StringToImageConverter}}"
+                        Stretch="Uniform"
+                        StretchDirection="DownOnly" />
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:QuoteRegion}">
+        <Border
+            Margin="0,0,0,20"
+            Padding="20,10"
+            BorderBrush="#eee"
+            BorderThickness="5,0,0,0">
+            <ItemsControl ItemsSource="{Binding Value}" />
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ListRegion}">
+        <ItemsControl ItemsSource="{Binding Value}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:ListItemRegion}">
+
+        <DataTemplate.Resources>
+            <!--  Here custom data template without margin padding etc  -->
+            <DataTemplate DataType="{x:Type regions:ParagraphRegion}">
+                <TextBlock
+                    extensions:TextBlockExtensions.MarkdownRenderer="{StaticResource MdRenderer}"
+                    extensions:TextBlockExtensions.Source="{Binding Value}"
+                    FontSize="{DynamicResource DefaultTextFontSize}"
+                    TextWrapping="WrapWithOverflow" />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type regions:QuoteRegion}">
+                <Border
+                    Padding="20,10"
+                    BorderBrush="#eee"
+                    BorderThickness="5,0,0,0">
+                    <ItemsControl ItemsSource="{Binding Value}" />
+                </Border>
+            </DataTemplate>
+        </DataTemplate.Resources>
+
+        <Border Margin="0,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel>
+                    <!--  Unordered list bullet  -->
+                    <Ellipse
+                        Width="4"
+                        Height="4"
+                        Margin="0,8,0,0"
+                        VerticalAlignment="Top"
+                        Fill="Black">
+                        <Ellipse.Style>
+                            <Style TargetType="{x:Type Ellipse}">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsOrdered}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+
+                    <!--  Ordered list bullet  -->
+                    <TextBlock FontSize="{StaticResource DefaultTextFontSize}" Visibility="{Binding IsOrdered, Converter={StaticResource BooleanToVisibilityConverter}}">
+                        <Run Text="{Binding Order}" /><Run Text="{Binding OrderedDelimiter}" />
+                    </TextBlock>
+                </StackPanel>
+
+                <ItemsControl
+                    Grid.Column="1"
+                    Margin="8,0,0,0"
+                    ItemsSource="{Binding Value}" />
+            </Grid>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:TableRegion}">
+        <ItemsControl ItemsSource="{Binding Value}" />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:TableRowRegion}">
+        <ItemsControl ItemsSource="{Binding Value}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Rows="1" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+        </ItemsControl>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type regions:TableCellRegion}">
+        <Border
+            Padding="5"
+            BorderBrush="Gray"
+            BorderThickness="1,1,1,1">
+            <ItemsControl ItemsSource="{Binding Value}" />
+        </Border>
+    </DataTemplate>
+</ResourceDictionary>

@@ -1,12 +1,18 @@
-﻿using MarkdownWPF.Models.Inlines;
-using System.Reflection.Metadata.Ecma335;
-
-namespace MarkdownWPF.Models.Regions
+﻿namespace MarkdownWPF.Models.Regions
 {
-    public class CodeRegion : CollectionRegionBase<IInline>
+    public class CodeRegion : RegionBase<string>
     {
+        public string LanguageName { get; } 
+
         public CodeRegion() : base()
         {
+
+        }
+
+        public CodeRegion(string code, string languageName) : base()
+        {
+            Value = code;
+            LanguageName = languageName;
         }
     }
 }

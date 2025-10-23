@@ -1,12 +1,12 @@
 ﻿using Markdig;
 using Markdig.Extensions.Tables;
+using Markdig.Helpers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
 using MarkdownWPF.Models.Inlines;
 using MarkdownWPF.Models.Regions;
 using System.Diagnostics;
-using System.Windows;
 
 namespace MarkdownWPF
 {
@@ -337,30 +337,30 @@ namespace MarkdownWPF
 
         public CodeRegion ToCodeRegion(CodeBlock codeBlock)
         {
-            var codeRegion = new CodeRegion();
-
-            if (codeBlock.Lines.Lines == null)
+            if (codeBlock.Lines.Count == 0)
             {
-                return codeRegion;
+                return new CodeRegion();
             }
 
-            foreach (var line in codeBlock.Lines.Lines)
-            {
-                codeRegion.Value.Add(new Paragraph(line.Slice.ToString()));
-            }
+            var codeResult = string.Empty;
+            var linesCount = codeBlock.Lines.Count;
 
-            var tmpElements = codeRegion.Value;
-            for (var i = tmpElements.Count - 1; i > 0; i--)
+            for (var i = 0; i < linesCount; i++)  
             {
-                if (!string.IsNullOrEmpty(tmpElements[i].Text))
+                StringLine line = codeBlock.Lines.Lines[i];
+                if (i == linesCount - 1)
                 {
-                    break;
+                    codeResult += line.Slice.ToString();
                 }
-
-                codeRegion.Value.RemoveAt(i);
+                else 
+                {
+                    codeResult += line.Slice.ToString() + "\n";
+                }
             }
 
-            return codeRegion;
+            var langName = codeBlock is FencedCodeBlock fencedCodeBlock ? fencedCodeBlock.Info : string.Empty;
+
+            return new CodeRegion(codeResult, langName);
         }
 
         public QuoteRegion GetQuoteRegion(QuoteBlock quoteBlock)
@@ -373,29 +373,6 @@ namespace MarkdownWPF
             }
 
             return region;
-        }
-        public static bool CheckURLValid(string url)
-        {
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                return false;
-            }
-
-            if (Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out var uriResult))
-            {
-                try
-                {
-                    return uriResult.Scheme == Uri.UriSchemeHttp
-                        || uriResult.Scheme == Uri.UriSchemeHttps
-                        || uriResult.Scheme == Uri.UriSchemeFile;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-
-            return false;
         }
 
         public ListRegion ToListRegion(ListBlock listBlockRoot)
