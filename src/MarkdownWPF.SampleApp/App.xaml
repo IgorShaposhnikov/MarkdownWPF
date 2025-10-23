@@ -11,10 +11,6 @@
             <DataTemplate DataType="{x:Type viewmodels:MarkdownPreviewViewModel}">
                 <pages:MarkdownPreviewView />
             </DataTemplate>
-
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Mvvm/Views/MarkdownElementDataTemplates.xaml" />
-            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
