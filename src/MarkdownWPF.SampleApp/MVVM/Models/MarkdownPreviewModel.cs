@@ -1,11 +1,13 @@
-﻿using MarkdownWPF.Models;
+﻿using MarkdownWPF.Html;
+using MarkdownWPF.Models;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 
 namespace MarkdownWPF.SampleApp.Mvvm.Models
 {
     public sealed class MarkdownPreviewModel : ObservableObject
     {
-        private readonly MarkdownParser _parser = new();
+        private readonly MarkdownParser _parser = new MarkdownParseBuilder().UseHtmlParsing().Build();
 
 
         #region Properties
@@ -34,7 +36,11 @@ namespace MarkdownWPF.SampleApp.Mvvm.Models
         /// </summary>
         private void OnParseTypedMarkdown()
         {
-            var elements = _parser.Parse(MarkdownInput);
+            var elements = _parser.Parse(MarkdownInput
+                .Replace("\\n", "\n")
+                .Replace("\\u003E", ">")
+                .Replace("\\u003C", "<")
+                );
             MarkdownElements.Clear();
             foreach (var element in elements)
             {

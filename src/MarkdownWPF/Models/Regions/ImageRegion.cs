@@ -31,6 +31,8 @@ namespace MarkdownWPF.Models.Regions
         {
             Value = image;
             Title = image.Text;
+            Width = image.Width;
+            Height = image.Height;
         }
     }
 }

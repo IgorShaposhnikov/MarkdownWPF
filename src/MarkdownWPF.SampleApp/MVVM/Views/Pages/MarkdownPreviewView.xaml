@@ -50,6 +50,7 @@
 
         <TextBox
             Margin="0,0,8,0"
+            xml:space="preserve"
             AcceptsReturn="True"
             AcceptsTab="True"
             FontSize="14"

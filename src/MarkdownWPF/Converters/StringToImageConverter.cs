@@ -127,10 +127,13 @@ namespace MarkdownWPF.Converters
 
         private void UpdateRegionDimensions(ImageRegion region, BitmapImage image)
         {
-            if (region != null && image != null)
+            if (region.Width == double.NaN) 
             {
-                region.Width = image.PixelWidth;
-                region.Height = image.PixelHeight;
+                if (region != null && image != null)
+                {
+                    region.Width = image.PixelWidth;
+                    region.Height = image.PixelHeight;
+                }
             }
         }
 

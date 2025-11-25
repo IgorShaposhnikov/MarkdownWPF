@@ -29,9 +29,19 @@
         /// </summary>
         public string? AdditionalUrl { get; }
 
+        public double Width { get; } = double.NaN;
+        public double Height { get; } = double.NaN;
+
         public InlineImage(string text, string url, string? addtionalUrl = null, IStyleableInline? parentInlinesStyles = null) : base(text, url, true, parentInlinesStyles)
         {
             AdditionalUrl = addtionalUrl;
+        }
+
+        public InlineImage(string text, string url, double width, double height, string ? addtionalUrl = null, IStyleableInline? parentInlinesStyles = null) : base(text, url, true, parentInlinesStyles)
+        {
+            AdditionalUrl = addtionalUrl;
+            Width = width;
+            Height = height;
         }
     }
 }

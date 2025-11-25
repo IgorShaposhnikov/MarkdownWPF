@@ -4,7 +4,7 @@
     {
         public string Text { get; }
 
-        public Paragraph(string value)
+        public Paragraph(string value = "")
         {
             Text = value;
         }

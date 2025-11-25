@@ -7,11 +7,25 @@ using MarkdownWPF.Models;
 using MarkdownWPF.Models.Inlines;
 using MarkdownWPF.Models.Regions;
 using System.Diagnostics;
+using System.Xml.Linq;
 
 namespace MarkdownWPF
 {
+    public interface IMarkdownParserExtension
+    {
+
+    }
+
     public class MarkdownParser
     {
+        private readonly Dictionary<Type, Func<IMarkdownObject, IEnumerable<IRegion>>> _extensions;
+
+        internal MarkdownParser(Dictionary<Type, Func<IMarkdownObject, IEnumerable<IRegion>>> extensions)
+        {
+            _extensions = extensions;
+        }
+
+
         public IEnumerable<IMarkdownElement> Parse(string text, Func<MarkdownPipeline>? getPipeline = null)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -48,38 +62,12 @@ namespace MarkdownWPF
             Debug.WriteLine(mdItem.GetType());
             if (mdItem is HeadingBlock headingBlock)
             {
-                elements.Add(GetHeader(headingBlock));
+                elements.Add(ToHeaderRegion(headingBlock));
             }
             else if (mdItem is ParagraphBlock paragraphBlock)
             {
-                var inlinesResult = GetInlines(paragraphBlock.Inline);
-                IList<Models.Inlines.IInline> inlines = [];
-
-                foreach (var inline in inlinesResult)
-                {
-                    if (inline is InlineLink inlineLink && inlineLink.IsImage)
-                    {
-                        var image = inlineLink as InlineImage;
-
-                        if (string.IsNullOrEmpty(image.AdditionalUrl))
-                        {
-                            inlines.Add(image);
-                        }
-                        else
-                        {
-                            inlines.Add(image);
-                        }
-
-                        continue;
-                    }
-
-                    inlines.Add(inline);
-                }
-
-                if (inlines.Count > 0)
-                {
-                    elements.Add(new ParagraphRegion(inlines));
-                }
+                var pr = ToParagraphRegion(paragraphBlock);
+                if (pr != null)  elements.Add(pr);
             }
             else if (mdItem is CodeBlock codeBlock)
             {
@@ -105,6 +93,68 @@ namespace MarkdownWPF
             {
                 elements.Add(ToTableRegion(table));
             }
+            else if (mdItem is HtmlBlock htmlBlock)
+            {
+                if (_extensions.TryGetValue(typeof(HtmlBlock), out var action))
+                {
+                    foreach (var i in action(mdItem))
+                    {
+                        elements.Add(i);
+                    }
+                }
+                else
+                {
+                    elements.Add(ToHtmlBlockRegion(htmlBlock));
+                }
+            }
+        }
+
+        private ParagraphRegion? ToParagraphRegion(ParagraphBlock paragraphBlock)
+        {
+            var inlinesResult = GetInlines(paragraphBlock.Inline);
+            IList<Models.Inlines.IInline> inlines = [];
+
+            foreach (var inline in inlinesResult)
+            {
+                if (inline is InlineLink inlineLink && inlineLink.IsImage)
+                {
+                    var image = inlineLink as InlineImage;
+
+                    if (string.IsNullOrEmpty(image.AdditionalUrl))
+                    {
+                        inlines.Add(image);
+                    }
+                    else
+                    {
+                        inlines.Add(image);
+                    }
+
+                    continue;
+                }
+
+                inlines.Add(inline);
+            }
+
+            if (inlines.Count > 0)
+            {
+                return new ParagraphRegion(inlines);
+            }
+
+            return null;
+        }
+
+        private IRegion ToHtmlBlockRegion(HtmlBlock htmlBlock)
+        {
+            foreach (var i in htmlBlock.Lines)
+            {
+                Console.WriteLine(i);
+            }
+
+            return new ParagraphRegion(
+                [
+                new Paragraph(htmlBlock.Lines.ToString())
+                ]
+                );
         }
 
         /// <summary>
@@ -182,6 +232,22 @@ namespace MarkdownWPF
                 return new Paragraph("");
             }
 
+            if (inline is HtmlInline htmlInline)
+            {
+                if (htmlInline.Tag == @"<br>")
+                {
+                    return new Paragraph("\n");
+                }
+
+                if (htmlInline.Tag == @"<img>")
+                {
+                    var s = htmlInline;
+                }
+
+                return new Paragraph();
+            }
+
+            //return new Paragraph();
             throw new NotSupportedException($"Unknown inline {inline.GetType()} argument");
         }
 
@@ -272,7 +338,7 @@ namespace MarkdownWPF
         /// </summary>
         /// <param name="headingBlock">HeadingBlock</param>
         /// <returns>Heading</returns>
-        public HeadingRegion GetHeader(HeadingBlock headingBlock)
+        public HeadingRegion ToHeaderRegion(HeadingBlock headingBlock)
         {
             var inlines = new List<Models.Inlines.IInline>();
 
@@ -345,14 +411,14 @@ namespace MarkdownWPF
             var codeResult = string.Empty;
             var linesCount = codeBlock.Lines.Count;
 
-            for (var i = 0; i < linesCount; i++)  
+            for (var i = 0; i < linesCount; i++)
             {
                 StringLine line = codeBlock.Lines.Lines[i];
                 if (i == linesCount - 1)
                 {
                     codeResult += line.Slice.ToString();
                 }
-                else 
+                else
                 {
                     codeResult += line.Slice.ToString() + "\n";
                 }

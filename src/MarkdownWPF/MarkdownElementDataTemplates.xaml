@@ -89,6 +89,7 @@
 
     <DataTemplate DataType="{x:Type regions:ImageRegion}">
         <Image
+            Width="{Binding Width}"
             MaxHeight="{Binding Height}"
             CacheMode="BitmapCache"
             Source="{Binding Converter={StaticResource StringToImageConverter}}"
