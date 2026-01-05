@@ -1,13 +1,12 @@
 ﻿using Markdig;
 using Markdig.Extensions.Tables;
-using Markdig.Helpers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using MarkdownWPF.Models;
 using MarkdownWPF.Models.Inlines;
 using MarkdownWPF.Models.Regions;
 using System.Diagnostics;
-using System.Xml.Linq;
+using System.Text;
 
 namespace MarkdownWPF
 {
@@ -67,7 +66,7 @@ namespace MarkdownWPF
             else if (mdItem is ParagraphBlock paragraphBlock)
             {
                 var pr = ToParagraphRegion(paragraphBlock);
-                if (pr != null)  elements.Add(pr);
+                if (pr != null) elements.Add(pr);
             }
             else if (mdItem is CodeBlock codeBlock)
             {
@@ -408,25 +407,28 @@ namespace MarkdownWPF
                 return new CodeRegion();
             }
 
-            var codeResult = string.Empty;
-            var linesCount = codeBlock.Lines.Count;
+            int totalSize = 0;
 
-            for (var i = 0; i < linesCount; i++)
+            for (int i = 0; i < codeBlock.Lines.Count; i++)
+                totalSize += codeBlock.Lines.Lines[i].Slice.Length;
+
+            totalSize += codeBlock.Lines.Count - 1;
+
+            var builder = new StringBuilder(totalSize);
+
+            var lines = codeBlock.Lines;
+
+            for (var i = 0; i < lines.Count; i++)
             {
-                StringLine line = codeBlock.Lines.Lines[i];
-                if (i == linesCount - 1)
-                {
-                    codeResult += line.Slice.ToString();
-                }
-                else
-                {
-                    codeResult += line.Slice.ToString() + "\n";
-                }
+                builder.Append(lines.Lines[i].Slice);
+                builder.Append('\n');
             }
 
-            var langName = codeBlock is FencedCodeBlock fencedCodeBlock ? fencedCodeBlock.Info : string.Empty;
+            builder.Length--;
 
-            return new CodeRegion(codeResult, langName);
+            var langName = codeBlock is FencedCodeBlock fencedCodeBlock ? fencedCodeBlock.Info ?? string.Empty : string.Empty;
+
+            return new CodeRegion(builder.ToString(), langName);
         }
 
         public QuoteRegion GetQuoteRegion(QuoteBlock quoteBlock)
