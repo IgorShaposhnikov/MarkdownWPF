@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace MarkdownWPF.Extensions
@@ -76,8 +75,16 @@ namespace MarkdownWPF.Extensions
             {
                 foreach (var item in collection)
                 {
-                    // Check the item is a IInline
-                    if (item is InlineContainer container)
+                    // Move all logic to IMarkdownRenderer impl
+                    if (item is IInlineLink link && !link.IsImage) 
+                    {
+                        var inline = render.RenderInline(link);
+                        if (inline != null)
+                        {
+                            textBlock.Inlines.Add(inline);
+                        }
+                    }
+                    else if (item is InlineContainer container)
                     {
                         textBlock.Inlines.AddRange(
                             render.RenderInlineContainer(container)

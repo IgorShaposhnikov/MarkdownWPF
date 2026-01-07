@@ -2,7 +2,7 @@
 
 namespace MarkdownWPF.Models.Regions
 {
-    public class ImageRegion : ObservableRegionBase<InlineLink>
+    public class ImageRegion : ObservableRegionBase<IInlineLink>
     {
         public string Title { get; }
 

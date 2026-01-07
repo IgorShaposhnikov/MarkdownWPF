@@ -13,14 +13,14 @@ namespace MarkdownWPF.Models.Inlines
         public Emphasis(string text,
             ISet<EmphasisTypography> typographyElements,
             ISet<EmphasisDecorations> decoration,
-            EmphasisWeight type = default,
+            EmphasisWeight weight = default,
             EmphasisStyle style = default,
             bool hasHighlight = default,
             IList<IInline>? inlines = null)
         {
             Text = text;
             TypographyElements = typographyElements;
-            Weight = type;
+            Weight = weight;
             Decorations = decoration;
             Style = style;
             HasHighlight = hasHighlight;

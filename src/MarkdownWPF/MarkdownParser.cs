@@ -17,9 +17,9 @@ namespace MarkdownWPF
 
     public class MarkdownParser
     {
-        private readonly Dictionary<Type, Func<IMarkdownObject, IEnumerable<IRegion>>> _extensions;
+        private readonly Dictionary<Type, Func<IMarkdownObject, IEnumerable<IMarkdownElement>>> _extensions;
 
-        internal MarkdownParser(Dictionary<Type, Func<IMarkdownObject, IEnumerable<IRegion>>> extensions)
+        internal MarkdownParser(Dictionary<Type, Func<IMarkdownObject, IEnumerable<IMarkdownElement>>> extensions)
         {
             _extensions = extensions;
         }
@@ -46,7 +46,7 @@ namespace MarkdownWPF
         /// <returns>Collection of IMarkdownElements</returns>
         private IEnumerable<IMarkdownElement> ParseMarkdigDocument(MarkdownDocument document)
         {
-            IList<IRegion> elements = [];
+            List<IRegion> elements = [];
 
             foreach (var mdItem in document)
             {
@@ -96,10 +96,15 @@ namespace MarkdownWPF
             {
                 if (_extensions.TryGetValue(typeof(HtmlBlock), out var action))
                 {
-                    foreach (var i in action(mdItem))
+                    var result = action(mdItem).Cast<IRegion>();
+                    if (elements is List<IRegion> list)
                     {
-                        elements.Add(i);
+                        list.AddRange(result);
                     }
+                    //else 
+                    //{
+                    //    foreach (var i in )
+                    //}
                 }
                 else
                 {
@@ -115,18 +120,10 @@ namespace MarkdownWPF
 
             foreach (var inline in inlinesResult)
             {
-                if (inline is InlineLink inlineLink && inlineLink.IsImage)
+                if (inline is IInlineLink inlineLink && inlineLink.IsImage)
                 {
                     var image = inlineLink as InlineImage;
-
-                    if (string.IsNullOrEmpty(image.AdditionalUrl))
-                    {
-                        inlines.Add(image);
-                    }
-                    else
-                    {
-                        inlines.Add(image);
-                    }
+                    inlines.Add(image!);
 
                     continue;
                 }
@@ -222,7 +219,23 @@ namespace MarkdownWPF
                     return new InlineImage(linkInline.Title, linkInline.Url);
                 }
 
-                return new InlineLink(GetTextFromInline(linkInline), linkInline.Url, linkInline.IsImage);
+                //if (inline.Parent.GetType() == typeof(LinkInline))
+                var inl = GetInlines(linkInline);
+                return new InlineLink(linkInline.Url, linkInline.IsImage, inl.ToList());
+
+                //if (linkInline.FirstChild is EmphasisInline emphasis) 
+                //{
+                //    //var linkText = TraverseEmphasis(
+                //    //    emphasis,
+                //    //    new HashSet<EmphasisTypography>(),
+                //    //    new HashSet<EmphasisDecorations>(),
+                //    //    text: GetTextFromInline(emphasis));
+
+
+
+                //}
+
+                return new InlineLink(GetTextFromInline(inline), linkInline.Url, linkInline.IsImage);
             }
 
             if (inline is LinkDelimiterInline linkDelimiterInline)
@@ -233,16 +246,11 @@ namespace MarkdownWPF
 
             if (inline is HtmlInline htmlInline)
             {
-                if (htmlInline.Tag == @"<br>")
+                //...
+                if (_extensions.TryGetValue(inline.GetType(), out var result)) 
                 {
-                    return new Paragraph("\n");
+                    var res = result(inline);
                 }
-
-                if (htmlInline.Tag == @"<img>")
-                {
-                    var s = htmlInline;
-                }
-
                 return new Paragraph();
             }
 
@@ -250,12 +258,6 @@ namespace MarkdownWPF
             throw new NotSupportedException($"Unknown inline {inline.GetType()} argument");
         }
 
-
-        // x - lenght of string before current element
-        // x - start current of substring in general string
-        // n - end of substring (normazlied for general string)
-        // +y - delimeter char count (start and end)
-        // 
 
         public Emphasis TraverseEmphasis(EmphasisInline emphasisInline,
             ISet<EmphasisTypography> typographyElements,
@@ -465,7 +467,7 @@ namespace MarkdownWPF
         {
             var parent = (listItemBlock.Parent as ListBlock);
 
-            var listItemRegion = new ListItemRegion(new List<IRegion>())
+            var listItemRegion = new ListItemRegion([])
             {
                 IsOrdered = parent.IsOrdered,
                 BulletType = parent.BulletType,
