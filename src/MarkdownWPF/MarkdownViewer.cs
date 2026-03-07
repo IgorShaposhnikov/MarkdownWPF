@@ -22,6 +22,7 @@ namespace MarkdownWPF
 
         public MarkdownViewer()
         {
+            VirtualizingPanel.SetScrollUnit(this, ScrollUnit.Pixel);
             VirtualizingPanel.SetIsVirtualizing(this, true);
             VirtualizingPanel.SetVirtualizationMode(this, VirtualizationMode.Recycling);
             ScrollViewer.SetCanContentScroll(this, true);
