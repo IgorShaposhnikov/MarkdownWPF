@@ -1,6 +1,5 @@
 using Markdig.Renderers;
 using Markdig.Syntax;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace MarkdownWPF.Renderers
@@ -9,10 +8,9 @@ namespace MarkdownWPF.Renderers
     {
         protected override void Write(WpfVirtualizingRenderer renderer, ListBlock listBlock)
         {
-            var stackPanel = new StackPanel
-            {
-                Margin = new Thickness(0, 5, 0, 5)
-            };
+            var stackPanel = new StackPanel();
+
+            renderer.ApplyStyle(stackPanel, MarkdownStyles.List);
 
             int orderStart = 1;
             if (listBlock.IsOrdered && int.TryParse(listBlock.OrderedStart, out int start))
@@ -21,6 +19,15 @@ namespace MarkdownWPF.Renderers
             }
 
             stackPanel.Tag = listBlock.IsOrdered ? orderStart : -1;
+
+            if (renderer.CurrentContext == null)
+            {
+                renderer.RootElements.Add(stackPanel);
+            }
+            else if (renderer.CurrentContext is Panel parentPanel)
+            {
+                parentPanel.Children.Add(stackPanel);
+            }
 
             renderer.Push(stackPanel);
 
@@ -35,15 +42,6 @@ namespace MarkdownWPF.Renderers
             }
 
             renderer.Pop();
-
-            if (renderer.CurrentContext is Panel parentPanel)
-            {
-                parentPanel.Children.Add(stackPanel);
-            }
-            else
-            {
-                renderer.RootElements.Add(stackPanel);
-            }
         }
     }
 }

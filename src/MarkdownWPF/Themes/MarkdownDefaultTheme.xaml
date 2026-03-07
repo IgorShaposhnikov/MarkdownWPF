@@ -1,0 +1,246 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--    -->
+    <!--  Colors  -->
+    <!--    -->
+
+    <SolidColorBrush x:Key="MarkdownTextBrush" Color="#333333" />
+    <SolidColorBrush x:Key="MarkdownBackgroundBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="MarkdownCodeBackgroundBrush" Color="#F6F8FA" />
+    <SolidColorBrush x:Key="MarkdownBorderBrush" Color="#D0D7DE" />
+    <SolidColorBrush x:Key="MarkdownLinkBrush" Color="#0969DA" />
+    <SolidColorBrush x:Key="MarkdownHighlightBrush" Color="#FFF766" />
+    <SolidColorBrush x:Key="MarkdownQuoteBorderBrush" Color="#D0D7DE" />
+    <SolidColorBrush x:Key="MarkdownQuoteTextBrush" Color="#656D76" />
+
+
+    <!--    -->
+    <!--  Base styles  -->
+    <!--    -->
+
+    <!--  Paragraph  -->
+    <Style x:Key="MarkdownParagraphStyleBase" TargetType="TextBlock">
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="LineHeight" Value="21" />
+    </Style>
+
+    <!--  Headings  -->
+    <Style x:Key="MarkdownHeading1StyleBase" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="32" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,0,0" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading2StyleBase"
+        BasedOn="{StaticResource MarkdownHeading1StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="Padding" Value="0,0,0,6" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading3StyleBase"
+        BasedOn="{StaticResource MarkdownHeading1StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="20" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading4StyleBase"
+        BasedOn="{StaticResource MarkdownHeading1StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="16" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading5StyleBase"
+        BasedOn="{StaticResource MarkdownHeading1StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading6StyleBase"
+        BasedOn="{StaticResource MarkdownHeading1StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+
+    <!--  Code block  -->
+    <Style x:Key="MarkdownCodeBlockBorderStyleBase" TargetType="Border">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+    <Style x:Key="MarkdownCodeBlockStyleBase" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="Consolas" />
+        <Setter Property="TextWrapping" Value="NoWrap" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="LineHeight" Value="19" />
+    </Style>
+
+    <!--  Thematic break  -->
+    <Style x:Key="MarkdownThematicBreakStyleBase" TargetType="Border">
+        <Setter Property="BorderThickness" Value="0,0,0,2" />
+        <Setter Property="Margin" Value="0,0,0,24" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!--  Lists  -->
+    <Style x:Key="MarkdownListStyleBase" TargetType="StackPanel">
+        <Setter Property="Margin" Value="0,0,0,16" />
+    </Style>
+    <Style x:Key="MarkdownListItemStyleBase" TargetType="Grid">
+        <Setter Property="Margin" Value="0,4,0,0" />
+    </Style>
+    <Style x:Key="MarkdownListItemMarkerStyleBase" TargetType="TextBlock">
+        <Setter Property="Margin" Value="15,0,8,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
+    <!--  Tables  -->
+    <Style x:Key="MarkdownTableStyleBase" TargetType="Grid">
+        <Setter Property="Margin" Value="0,0,0,16" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+    <Style x:Key="MarkdownTableCellStyleBase" TargetType="Border">
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="13,6" />
+    </Style>
+
+    <!--    -->
+    <!--  Default styles  -->
+    <!--    -->
+
+    <!--  Block elements  -->
+    <Style
+        x:Key="MarkdownParagraphStyle"
+        BasedOn="{StaticResource MarkdownParagraphStyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+
+    <Style
+        x:Key="MarkdownHeading1Style"
+        BasedOn="{StaticResource MarkdownHeading1StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading2Style"
+        BasedOn="{StaticResource MarkdownHeading2StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading3Style"
+        BasedOn="{StaticResource MarkdownHeading3StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading4Style"
+        BasedOn="{StaticResource MarkdownHeading4StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading5Style"
+        BasedOn="{StaticResource MarkdownHeading5StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+    <Style
+        x:Key="MarkdownHeading6Style"
+        BasedOn="{StaticResource MarkdownHeading6StyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownQuoteTextBrush}" />
+    </Style>
+
+    <Style
+        x:Key="MarkdownCodeBlockBorderStyle"
+        BasedOn="{StaticResource MarkdownCodeBlockBorderStyleBase}"
+        TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource MarkdownCodeBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MarkdownBorderBrush}" />
+    </Style>
+    <Style
+        x:Key="MarkdownCodeBlockStyle"
+        BasedOn="{StaticResource MarkdownCodeBlockStyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+
+    <Style
+        x:Key="MarkdownThematicBreakStyle"
+        BasedOn="{StaticResource MarkdownThematicBreakStyleBase}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource MarkdownBorderBrush}" />
+    </Style>
+
+    <Style
+        x:Key="MarkdownListStyle"
+        BasedOn="{StaticResource MarkdownListStyleBase}"
+        TargetType="StackPanel" />
+
+    <Style
+        x:Key="MarkdownListItemStyle"
+        BasedOn="{StaticResource MarkdownListItemStyleBase}"
+        TargetType="Grid" />
+
+    <Style
+        x:Key="MarkdownListItemMarkerStyle"
+        BasedOn="{StaticResource MarkdownListItemMarkerStyleBase}"
+        TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+    </Style>
+
+    <Style
+        x:Key="MarkdownTableStyle"
+        BasedOn="{StaticResource MarkdownTableStyleBase}"
+        TargetType="Grid" />
+    <Style
+        x:Key="MarkdownTableCellStyle"
+        BasedOn="{StaticResource MarkdownTableCellStyleBase}"
+        TargetType="Border">
+        <Setter Property="BorderBrush" Value="{DynamicResource MarkdownBorderBrush}" />
+    </Style>
+
+    <!--    -->
+    <!--  Inline elements  -->
+    <!--    -->
+
+    <Style x:Key="MarkdownCodeInlineStyle" TargetType="Run">
+        <Setter Property="FontFamily" Value="Consolas" />
+        <Setter Property="Background" Value="{DynamicResource MarkdownCodeBackgroundBrush}" />
+    </Style>
+
+    <Style x:Key="MarkdownLinkStyle" TargetType="Hyperlink">
+        <Setter Property="Foreground" Value="{DynamicResource MarkdownLinkBrush}" />
+        <Setter Property="TextDecorations" Value="None" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="MarkdownStrongStyle" TargetType="Span">
+        <Setter Property="FontWeight" Value="Bold" />
+    </Style>
+
+    <Style x:Key="MarkdownEmphasisStyle" TargetType="Span">
+        <Setter Property="FontStyle" Value="Italic" />
+    </Style>
+
+    <Style x:Key="MarkdownStrikethroughStyle" TargetType="Span">
+        <Setter Property="TextDecorations" Value="Strikethrough" />
+    </Style>
+
+    <Style x:Key="MarkdownMarkStyle" TargetType="Span">
+        <Setter Property="Background" Value="{DynamicResource MarkdownHighlightBrush}" />
+    </Style>
+
+</ResourceDictionary>

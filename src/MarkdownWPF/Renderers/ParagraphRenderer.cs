@@ -1,6 +1,5 @@
 using Markdig.Renderers;
 using Markdig.Syntax;
-using System.Windows;
 using System.Windows.Controls;
 
 namespace MarkdownWPF.Renderers
@@ -9,24 +8,17 @@ namespace MarkdownWPF.Renderers
     {
         protected override void Write(WpfVirtualizingRenderer renderer, ParagraphBlock obj)
         {
-            if (renderer.CurrentContext is TextBlock existingTb)
+            if (renderer.CurrentContext is TextBlock)
             {
                 renderer.WriteLeafInline(obj);
                 return;
             }
 
-            var tb = new TextBlock 
-            { 
-                TextWrapping = TextWrapping.Wrap, 
-                Margin = new Thickness(0, 0, 0, 10),
-                FontSize = 14,
-                LineHeight = double.NaN
-            };
+            var tb = new TextBlock();
+            renderer.ApplyStyle(tb, MarkdownStyles.Paragraph);
 
-            if (renderer.CurrentContext == null)
-                renderer.RootElements.Add(tb);
-            else if (renderer.CurrentContext is StackPanel sp)
-                sp.Children.Add(tb);
+            if (renderer.CurrentContext == null) renderer.RootElements.Add(tb);
+            else if (renderer.CurrentContext is StackPanel sp) sp.Children.Add(tb);
 
             renderer.Push(tb);
             renderer.WriteLeafInline(obj);

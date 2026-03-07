@@ -40,6 +40,13 @@
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
             <Setter Property="ItemContainerStyle" Value="{StaticResource TransparentListBoxItem}" />
         </Style>
+
+        <Style
+            x:Key="MarkdownHeading1Style"
+            BasedOn="{StaticResource MarkdownHeading1StyleBase}"
+            TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Blue" />
+        </Style>
     </UserControl.Resources>
 
 
@@ -69,7 +76,10 @@
             Grid.Column="2"
             Padding="0"
             Background="Transparent">
-            <md:MarkdownViewer Markdown="{Binding Model.MarkdownInput, UpdateSourceTrigger=PropertyChanged}" TextElement.FontSize="14" />
+            <md:MarkdownViewer
+                Markdown="{Binding Model.MarkdownInput, UpdateSourceTrigger=PropertyChanged}"
+                StyleResourceMode="Dynamic"
+                TextElement.FontSize="14" />
         </Border>
     </Grid>
 </UserControl>

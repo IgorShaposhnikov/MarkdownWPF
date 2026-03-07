@@ -2,6 +2,7 @@ using Markdig.Renderers;
 using Markdig.Syntax;
 using MarkdownWPF.Renderers;
 using System.Windows;
+using System.Collections.Generic;
 
 namespace MarkdownWPF
 {
@@ -9,9 +10,17 @@ namespace MarkdownWPF
     {
         public List<UIElement> RootElements { get; } = new();
         private readonly Stack<object> _contextStack = new();
+        public FrameworkElement? ContextElement { get; }
+        public StyleResourceMode StyleResourceMode { get; }
 
-        public WpfVirtualizingRenderer()
+        // Кэш для стилей
+        private readonly Dictionary<string, Style?> _styleCache = new();
+
+        public WpfVirtualizingRenderer(FrameworkElement? frameworkElement = null, StyleResourceMode styleResourceMode = StyleResourceMode.Static)
         {
+            ContextElement = frameworkElement;
+            StyleResourceMode = styleResourceMode;
+
             ObjectRenderers.Add(new HeadingRenderer());
             ObjectRenderers.Add(new ParagraphRenderer());
             ObjectRenderers.Add(new CodeBlockRenderer());
@@ -34,6 +43,40 @@ namespace MarkdownWPF
         {
             Write(markdownObject);
             return RootElements;
+        }
+
+        // For block elements (Border, TextBlock, Grid)
+        public void ApplyStyle(FrameworkElement element, string styleKey)
+        {
+            if (StyleResourceMode == StyleResourceMode.Dynamic)
+            {
+                element.SetResourceReference(FrameworkElement.StyleProperty, styleKey);
+                return;
+            }
+
+            if (!_styleCache.TryGetValue(styleKey, out var style))
+            {
+                style = ContextElement?.TryFindResource(styleKey) as Style;
+                _styleCache[styleKey] = style;
+            }
+            if (style != null) element.Style = style;
+        }
+
+        // For Inline elements (Run, Span, Hyperlink)
+        public void ApplyStyle(FrameworkContentElement element, string styleKey)
+        {
+            if (StyleResourceMode == StyleResourceMode.Dynamic)
+            {
+                element.SetResourceReference(FrameworkContentElement.StyleProperty, styleKey);
+                return;
+            }
+
+            if (!_styleCache.TryGetValue(styleKey, out var style))
+            {
+                style = ContextElement?.TryFindResource(styleKey) as Style;
+                _styleCache[styleKey] = style;
+            }
+            if (style != null) element.Style = style;
         }
 
         public void Push(object context) => _contextStack.Push(context);

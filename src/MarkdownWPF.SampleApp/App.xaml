@@ -8,6 +8,10 @@
     StartupUri="Mvvm/Views/Windows/MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MarkdownWPF;component/Themes/MarkdownDefaultTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
             <DataTemplate DataType="{x:Type viewmodels:MarkdownPreviewViewModel}">
                 <pages:MarkdownPreviewView />
             </DataTemplate>

@@ -1,8 +1,7 @@
 using Markdig.Renderers;
 using Markdig.Syntax;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents; // Нужно для TextElement
+using System.Windows;
 
 namespace MarkdownWPF.Renderers
 {
@@ -10,7 +9,11 @@ namespace MarkdownWPF.Renderers
     {
         protected override void Write(WpfVirtualizingRenderer renderer, ListItemBlock listItemBlock)
         {
-            var stackPanel = new StackPanel { Orientation = Orientation.Horizontal };
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            renderer.ApplyStyle(grid, MarkdownStyles.ListItem);
 
             string markerText = "• ";
             if (renderer.CurrentContext is StackPanel parentList && parentList.Tag is int orderNumber && orderNumber != -1)
@@ -19,17 +22,15 @@ namespace MarkdownWPF.Renderers
                 markerText = $"{orderNumber}{delimiter} ";
             }
 
-            var marker = new TextBlock
-            {
-                Text = markerText,
-                Margin = new Thickness(0, 0, 5, 0)
-            };
+            var marker = new TextBlock { Text = markerText };
+            renderer.ApplyStyle(marker, MarkdownStyles.ListItemMarker);
+
+            Grid.SetColumn(marker, 0);
+            grid.Children.Add(marker);
 
             var contentPanel = new StackPanel();
-            contentPanel.VerticalAlignment = VerticalAlignment.Center;
-
-            stackPanel.Children.Add(marker);
-            stackPanel.Children.Add(contentPanel);
+            Grid.SetColumn(contentPanel, 1);
+            grid.Children.Add(contentPanel);
 
             renderer.Push(contentPanel);
             renderer.WriteChildren(listItemBlock);
@@ -37,7 +38,7 @@ namespace MarkdownWPF.Renderers
 
             if (renderer.CurrentContext is Panel parentPanel)
             {
-                parentPanel.Children.Add(stackPanel);
+                parentPanel.Children.Add(grid);
             }
         }
     }

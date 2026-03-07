@@ -10,10 +10,20 @@ namespace MarkdownWPF
             DependencyProperty.Register(nameof(Markdown), typeof(string), typeof(MarkdownViewer),
                 new PropertyMetadata(string.Empty, OnMarkdownChanged));
 
+        public static readonly DependencyProperty StyleResourceModeProperty =
+            DependencyProperty.Register(nameof(StyleResourceMode), typeof(StyleResourceMode), typeof(MarkdownViewer),
+            new PropertyMetadata(StyleResourceMode.Static, OnStyleResourceModeChanged));
+
         public string Markdown
         {
             get => (string)GetValue(MarkdownProperty);
             set => SetValue(MarkdownProperty, value);
+        }
+
+        public StyleResourceMode StyleResourceMode
+        {
+            get => (StyleResourceMode)GetValue(StyleResourceModeProperty);
+            set => SetValue(StyleResourceModeProperty, value);
         }
 
         private static readonly MarkdownPipeline _pipeline = new MarkdownPipelineBuilder()
@@ -49,6 +59,14 @@ namespace MarkdownWPF
             }
         }
 
+        private static void OnStyleResourceModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is MarkdownViewer viewer) 
+            {
+                viewer.RenderMarkdown(viewer.Markdown);
+            }
+        }
+
         private void RenderMarkdown(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
@@ -58,7 +76,7 @@ namespace MarkdownWPF
             }
 
             var document = Markdig.Markdown.Parse(text, _pipeline);
-            var renderer = new WpfVirtualizingRenderer();
+            var renderer = new WpfVirtualizingRenderer(this, StyleResourceMode);
             var elements = (List<UIElement>)renderer.Render(document);
             ItemsSource = elements;
         }
