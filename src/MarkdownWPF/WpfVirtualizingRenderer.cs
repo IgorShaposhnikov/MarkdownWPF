@@ -17,6 +17,7 @@ namespace MarkdownWPF
             ObjectRenderers.Add(new LiteralInlineRenderer());
             ObjectRenderers.Add(new CodeInlineRenderer());
             ObjectRenderers.Add(new CodeBlockRenderer());
+            ObjectRenderers.Add(new EmphasisRenderer());
         }
 
         public override object Render(MarkdownObject markdownObject)
