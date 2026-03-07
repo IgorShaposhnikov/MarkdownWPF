@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MarkdownWPF.SampleApp.Mvvm.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="clr-namespace:MarkdownWPF;assembly=MarkdownWPF"
     xmlns:viewmodels="clr-namespace:MarkdownWPF.SampleApp.Mvvm.ViewModels"
     d:DataContext="{d:DesignInstance Type=viewmodels:MarkdownPreviewViewModel}"
     d:DesignHeight="450"
@@ -45,6 +46,7 @@
     <Grid Margin="8">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -57,11 +59,17 @@
             TextWrapping="Wrap"
             VerticalScrollBarVisibility="Auto" />
 
-        <ListBox
+        <GridSplitter
             Grid.Column="1"
+            Width="5"
+            HorizontalAlignment="Stretch"
+            Background="#E0E0E0" />
+
+        <Border
+            Grid.Column="2"
             Padding="0"
-            ItemsSource="{Binding Model.MarkdownElements}"
-            Style="{StaticResource TransparentListBox}"
-            VirtualizingPanel.ScrollUnit="Pixel" />
+            Background="Transparent">
+            <md:MarkdownViewer Markdown="{Binding Model.MarkdownInput, UpdateSourceTrigger=PropertyChanged}" />
+        </Border>
     </Grid>
 </UserControl>
