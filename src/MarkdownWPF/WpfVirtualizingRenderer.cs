@@ -1,7 +1,6 @@
 using Markdig.Renderers;
 using Markdig.Syntax;
 using MarkdownWPF.Renderers;
-using System.Collections.Generic;
 using System.Windows;
 
 namespace MarkdownWPF
@@ -16,6 +15,8 @@ namespace MarkdownWPF
             ObjectRenderers.Add(new HeadingRenderer());
             ObjectRenderers.Add(new ParagraphRenderer());
             ObjectRenderers.Add(new LiteralInlineRenderer());
+            ObjectRenderers.Add(new CodeInlineRenderer());
+            ObjectRenderers.Add(new CodeBlockRenderer());
         }
 
         public override object Render(MarkdownObject markdownObject)
