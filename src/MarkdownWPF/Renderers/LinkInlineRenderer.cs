@@ -1,12 +1,12 @@
 using Markdig.Renderers;
 using Markdig.Syntax.Inlines;
-using System;
 using System.Diagnostics;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Media.Imaging;
-using System.Windows.Media;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace MarkdownWPF.Renderers
 {
@@ -16,7 +16,6 @@ namespace MarkdownWPF.Renderers
         {
             if (obj.IsImage)
             {
-                // --- РЕНДЕРИНГ КАРТИНОК ---
                 var inlineContainer = new InlineUIContainer();
 
                 try
@@ -26,42 +25,49 @@ namespace MarkdownWPF.Renderers
                         var bitmap = new BitmapImage();
                         bitmap.BeginInit();
                         bitmap.UriSource = uri;
-                        bitmap.CacheOption = BitmapCacheOption.OnLoad; // Асинхронная загрузка, чтобы не вис UI
+                        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+
+                        bitmap.DecodePixelWidth = renderer.OptimalImageDecodeWidth;
                         bitmap.EndInit();
 
                         var image = new Image
                         {
                             Source = bitmap,
                             Stretch = Stretch.Uniform,
-                            Margin = new Thickness(0, 5, 0, 5)
+                            Margin = new Thickness(0, 8, 0, 8),
+                            HorizontalAlignment = HorizontalAlignment.Left
                         };
-
-                        // Можно ограничить максимальную ширину/высоту картинки
                         RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
+
+                        if (renderer.ContextElement != null)
+                        {
+                            var binding = new Binding(nameof(FrameworkElement.ActualWidth))
+                            {
+                                Source = renderer.ContextElement
+                            };
+                            BindingOperations.SetBinding(image, FrameworkElement.MaxWidthProperty, binding);
+                        }
+
                         inlineContainer.Child = image;
                     }
                 }
                 catch
                 {
-                    // Если URL битый, выводим заглушку
                     var tb = new TextBlock { Text = $"[Image: {obj.Url}]", Foreground = Brushes.Red };
                     inlineContainer.Child = tb;
                 }
 
-                // Вставляем картинку в текущий контекст (например, в Paragraph или внутрь Hyperlink)
                 if (renderer.CurrentContext is Span s) s.Inlines.Add(inlineContainer);
                 else if (renderer.CurrentContext is TextBlock t) t.Inlines.Add(inlineContainer);
 
                 return;
             }
 
-            // --- РЕНДЕРИНГ ССЫЛОК ---
             var link = new Hyperlink();
             if (Uri.TryCreate(obj.Url, UriKind.RelativeOrAbsolute, out var linkUri))
             {
                 link.NavigateUri = linkUri;
 
-                // Делаем ссылку кликабельной, чтобы она открывалась в браузере
                 link.RequestNavigate += (sender, e) =>
                 {
                     try { Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true }); }
@@ -75,8 +81,6 @@ namespace MarkdownWPF.Renderers
             if (renderer.CurrentContext is Span span) span.Inlines.Add(link);
             else if (renderer.CurrentContext is TextBlock tb) tb.Inlines.Add(link);
 
-            // КРИТИЧНО ВАЖНО: пушим ссылку в контекст и рендерим её "детей".
-            // Если внутри ссылки есть текст или картинка, они будут отрендерены внутрь этой ссылки.
             renderer.Push(link);
             renderer.WriteChildren(obj);
             renderer.Pop();

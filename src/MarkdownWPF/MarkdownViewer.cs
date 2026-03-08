@@ -14,6 +14,10 @@ namespace MarkdownWPF
             DependencyProperty.Register(nameof(StyleResourceMode), typeof(StyleResourceMode), typeof(MarkdownViewer),
             new PropertyMetadata(StyleResourceMode.Static, OnStyleResourceModeChanged));
 
+        public static readonly DependencyProperty ImageMaxDecodeWidthProperty =
+            DependencyProperty.Register(nameof(ImageMaxDecodeWidth), typeof(int), typeof(MarkdownViewer),
+                new PropertyMetadata(0, OnMarkdownChanged));
+
         public string Markdown
         {
             get => (string)GetValue(MarkdownProperty);
@@ -24,6 +28,12 @@ namespace MarkdownWPF
         {
             get => (StyleResourceMode)GetValue(StyleResourceModeProperty);
             set => SetValue(StyleResourceModeProperty, value);
+        }
+
+        public int ImageMaxDecodeWidth
+        {
+            get => (int)GetValue(ImageMaxDecodeWidthProperty);
+            set => SetValue(ImageMaxDecodeWidthProperty, value);
         }
 
         private static readonly MarkdownPipeline _pipeline = new MarkdownPipelineBuilder()
@@ -61,7 +71,7 @@ namespace MarkdownWPF
 
         private static void OnStyleResourceModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is MarkdownViewer viewer) 
+            if (d is MarkdownViewer viewer)
             {
                 viewer.RenderMarkdown(viewer.Markdown);
             }
@@ -75,10 +85,50 @@ namespace MarkdownWPF
                 return;
             }
 
+            var optimalImageDecodeWidth = CalculateOptimalDecodeWidth();
+
             var document = Markdig.Markdown.Parse(text, _pipeline);
             var renderer = new WpfVirtualizingRenderer(this, StyleResourceMode);
+            renderer.OptimalImageDecodeWidth = optimalImageDecodeWidth;
             var elements = (List<UIElement>)renderer.Render(document);
             ItemsSource = elements;
         }
+
+        private int CalculateOptimalDecodeWidth()
+        {
+            // 1. ПРОВЕРКА РУЧНОЙ НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ
+            if (ImageMaxDecodeWidth > 0)
+            {
+                return ImageMaxDecodeWidth; // Если задано 500, возвращаем 500 и выходим
+            }
+
+            // 2. АВТОМАТИЧЕСКИЙ РАСЧЕТ (магия)
+            double optimalWidth = SystemParameters.PrimaryScreenWidth > 0 ? SystemParameters.PrimaryScreenWidth : 1920;
+
+            if (!double.IsPositiveInfinity(this.MaxWidth) && this.MaxWidth > 0)
+            {
+                return (int)this.MaxWidth;
+            }
+
+            var window = Window.GetWindow(this);
+            if (window != null)
+            {
+                if (!double.IsPositiveInfinity(window.MaxWidth) && window.MaxWidth > 0)
+                {
+                    optimalWidth = Math.Min(optimalWidth, window.MaxWidth);
+                }
+                else if (window.ResizeMode == ResizeMode.NoResize || window.ResizeMode == ResizeMode.CanMinimize)
+                {
+                    double staticWidth = window.Width > 0 ? window.Width : window.ActualWidth;
+                    if (staticWidth > 0)
+                    {
+                        optimalWidth = Math.Min(optimalWidth, staticWidth);
+                    }
+                }
+            }
+
+            return (int)optimalWidth;
+        }
+
     }
 }

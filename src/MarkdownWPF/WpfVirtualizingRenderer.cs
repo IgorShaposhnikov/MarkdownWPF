@@ -13,6 +13,7 @@ namespace MarkdownWPF
         private readonly Stack<object> _contextStack = new();
         public FrameworkElement? ContextElement { get; }
         public StyleResourceMode StyleResourceMode { get; }
+        public int OptimalImageDecodeWidth { get; set; } = 1920;
 
         // Кэш для стилей
         private readonly Dictionary<string, Style?> _styleCache = new();
