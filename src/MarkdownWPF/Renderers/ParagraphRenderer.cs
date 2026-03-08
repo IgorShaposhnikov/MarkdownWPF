@@ -16,6 +16,7 @@ namespace MarkdownWPF.Renderers
 
             var tb = new TextBlock();
             renderer.ApplyStyle(tb, MarkdownStyles.Paragraph);
+            renderer.HandleLastChildMargin(tb, obj);
 
             if (renderer.CurrentContext == null) renderer.RootElements.Add(tb);
             else if (renderer.CurrentContext is StackPanel sp) sp.Children.Add(tb);

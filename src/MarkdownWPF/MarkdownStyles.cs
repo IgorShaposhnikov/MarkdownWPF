@@ -7,6 +7,8 @@ namespace MarkdownWPF
         public const string CodeBlock = "MarkdownCodeBlockStyle";
         public const string CodeBlockBorder = "MarkdownCodeBlockBorderStyle";
         public const string ThematicBreak = "MarkdownThematicBreakStyle";
+        public const string BlockQuote = "MarkdownBlockQuoteStyle";
+
 
         // Headers
         public const string Heading1 = "MarkdownHeading1Style";
@@ -21,8 +23,8 @@ namespace MarkdownWPF
         public const string ListItem = "MarkdownListItemStyle";
         public const string ListItemMarker = "MarkdownListItemMarkerStyle";
         public const string Table = "MarkdownTableStyle";
-        public const string TableRow = "MarkdownTableRowStyle";
         public const string TableCell = "MarkdownTableCellStyle";
+        public const string TableHeaderCell = "MarkdownTableHeaderCellStyle";
 
         // Inline elements
         public const string CodeInline = "MarkdownCodeInlineStyle";

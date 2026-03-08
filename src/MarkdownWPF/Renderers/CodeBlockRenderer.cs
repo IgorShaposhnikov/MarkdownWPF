@@ -12,6 +12,7 @@ namespace MarkdownWPF.Renderers
 
             var border = new Border();
             renderer.ApplyStyle(border, MarkdownStyles.CodeBlockBorder);
+            renderer.HandleLastChildMargin(border, obj);
 
             var tb = new TextBlock { Text = text };
             renderer.ApplyStyle(tb, MarkdownStyles.CodeBlock);

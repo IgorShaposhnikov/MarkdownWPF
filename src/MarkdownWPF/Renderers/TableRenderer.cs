@@ -2,14 +2,13 @@ using Markdig.Renderers;
 using Markdig.Syntax;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using MdTable = Markdig.Extensions.Tables.Table;
 using MdTableRow = Markdig.Extensions.Tables.TableRow;
 using MdTableCell = Markdig.Extensions.Tables.TableCell;
 
 namespace MarkdownWPF.Renderers
 {
-    public class TableContext 
+    public class TableContext
     {
         public Grid Grid { get; set; } = new Grid();
         public int RowIndex { get; set; }
@@ -22,7 +21,15 @@ namespace MarkdownWPF.Renderers
     {
         protected override void Write(WpfVirtualizingRenderer renderer, MdTable obj)
         {
-            var grid = new Grid { Margin = new Thickness(0, 10, 0, 15), HorizontalAlignment = HorizontalAlignment.Stretch };
+            var grid = new Grid();
+
+            // 1. Применяем стиль к таблице
+            renderer.ApplyStyle(grid, MarkdownStyles.Table);
+
+            // 2. Убираем нижний отступ, если таблица - последний элемент
+            renderer.HandleLastChildMargin(grid, obj);
+
+            // 3. Создаем колонки
             for (int i = 0; i < obj.ColumnDefinitions.Count; i++)
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
@@ -44,7 +51,7 @@ namespace MarkdownWPF.Renderers
             {
                 ctx.Grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
                 ctx.RowIndex++;
-                ctx.ColIndex = 0; 
+                ctx.ColIndex = 0;
                 ctx.IsInHeader = obj.IsHeader;
                 renderer.WriteChildren(obj);
             }
@@ -57,22 +64,32 @@ namespace MarkdownWPF.Renderers
         {
             if (renderer.CurrentContext is TableContext ctx)
             {
-                var border = new Border
+                var border = new Border();
+
+                // 1. Применяем стиль в зависимости от того, шапка это или обычная ячейка
+                if (ctx.IsInHeader)
                 {
-                    BorderBrush = new SolidColorBrush(Color.FromRgb(223, 226, 229)),
-                    BorderThickness = new Thickness(1),
-                    Padding = new Thickness(10, 6, 10, 6),
-                    Background = (ctx.RowIndex % 2 == 0) ? new SolidColorBrush(Colors.White) : new SolidColorBrush(Color.FromRgb(246, 248, 250))
-                };
-                if (ctx.IsInHeader) border.Background = new SolidColorBrush(Color.FromRgb(240, 240, 240));
+                    renderer.ApplyStyle(border, MarkdownStyles.TableHeaderCell);
+                }
+                else
+                {
+                    renderer.ApplyStyle(border, MarkdownStyles.TableCell);
+
+                    // Опционально: Зебра (чередование цветов строк). 
+                    // Если вы хотите оставить эту фичу без хардкода, 
+                    // лучше просто оставить ячейки прозрачными (как в стиле выше).
+                    // Но если очень нужно, можно использовать DynamicResource программно:
+                    // if (ctx.RowIndex % 2 != 0) 
+                    //    border.SetResourceReference(Border.BackgroundProperty, "MarkdownCodeBackgroundBrush");
+                }
 
                 Grid.SetRow(border, ctx.RowIndex);
                 Grid.SetColumn(border, ctx.ColIndex);
                 ctx.Grid.Children.Add(border);
 
                 var tb = new TextBlock { VerticalAlignment = VerticalAlignment.Center, TextWrapping = TextWrapping.Wrap };
-                if (ctx.IsInHeader) tb.FontWeight = FontWeights.Bold;
 
+                // 2. Выравнивание текста в колонке (из Markdig AST)
                 if (ctx.CurrentTable != null && ctx.ColIndex < ctx.CurrentTable.ColumnDefinitions.Count)
                 {
                     var alignment = ctx.CurrentTable.ColumnDefinitions[ctx.ColIndex].Alignment;
@@ -88,13 +105,18 @@ namespace MarkdownWPF.Renderers
                 }
 
                 border.Child = tb;
+
+                // 3. Рендерим содержимое ячейки
                 renderer.Push(tb);
                 foreach (var block in obj)
                 {
-                    if (block is ParagraphBlock paragraph && paragraph.Inline != null) renderer.WriteChildren(paragraph.Inline);
-                    else renderer.Write(block);
+                    if (block is ParagraphBlock paragraph && paragraph.Inline != null)
+                        renderer.WriteChildren(paragraph.Inline);
+                    else
+                        renderer.Write(block);
                 }
                 renderer.Pop();
+
                 ctx.ColIndex++;
             }
         }

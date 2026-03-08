@@ -1,8 +1,9 @@
 using Markdig.Renderers;
 using Markdig.Syntax;
+using MarkdownWPF.Extensions;
 using MarkdownWPF.Renderers;
-using System.Windows;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace MarkdownWPF
 {
@@ -27,6 +28,7 @@ namespace MarkdownWPF
             ObjectRenderers.Add(new ListRenderer());
             ObjectRenderers.Add(new ListItemRenderer());
             ObjectRenderers.Add(new ThematicBreakRenderer());
+            ObjectRenderers.Add(new BlockQuoteRenderer());
 
             ObjectRenderers.Add(new TableRenderer());
             ObjectRenderers.Add(new TableRowRenderer());
@@ -88,6 +90,14 @@ namespace MarkdownWPF
             if (leafBlock.Inline != null)
             {
                 WriteChildren(leafBlock.Inline);
+            }
+        }
+
+        public void HandleLastChildMargin(FrameworkElement element, Markdig.Syntax.Block block)
+        {
+            if (block.Parent != null && block.Parent[block.Parent.Count - 1] == block)
+            {
+                MarkdownProperties.SetIsLastChild(element, true);
             }
         }
     }

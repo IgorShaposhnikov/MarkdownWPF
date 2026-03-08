@@ -11,6 +11,7 @@ namespace MarkdownWPF.Renderers
             var stackPanel = new StackPanel();
 
             renderer.ApplyStyle(stackPanel, MarkdownStyles.List);
+            renderer.HandleLastChildMargin(stackPanel, listBlock);
 
             int orderStart = 1;
             if (listBlock.IsOrdered && int.TryParse(listBlock.OrderedStart, out int start))

@@ -20,6 +20,7 @@ namespace MarkdownWPF.Renderers
             };
 
             renderer.ApplyStyle(tb, styleKey);
+            renderer.HandleLastChildMargin(tb, obj);
 
             if (renderer.CurrentContext == null) renderer.RootElements.Add(tb);
             else if (renderer.CurrentContext is StackPanel sp) sp.Children.Add(tb);
