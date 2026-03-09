@@ -10,6 +10,7 @@
     Width="800"
     Height="450"
     d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
+    ResizeMode="NoResize"
     mc:Ignorable="d">
     <Grid>
         <ContentControl Content="{Binding CurrentViewModel}" />

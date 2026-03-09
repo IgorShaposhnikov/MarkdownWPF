@@ -96,13 +96,11 @@ namespace MarkdownWPF
 
         private int CalculateOptimalDecodeWidth()
         {
-            // 1. ПРОВЕРКА РУЧНОЙ НАСТРОЙКИ ПОЛЬЗОВАТЕЛЯ
             if (ImageMaxDecodeWidth > 0)
             {
                 return ImageMaxDecodeWidth; // Если задано 500, возвращаем 500 и выходим
             }
 
-            // 2. АВТОМАТИЧЕСКИЙ РАСЧЕТ (магия)
             double optimalWidth = SystemParameters.PrimaryScreenWidth > 0 ? SystemParameters.PrimaryScreenWidth : 1920;
 
             if (!double.IsPositiveInfinity(this.MaxWidth) && this.MaxWidth > 0)
