@@ -1,4 +1,4 @@
-﻿namespace MarkdownWPF.SampleApp.Mvvm
+namespace MarkdownWPF.SampleApp.Mvvm
 {
-    public abstract class ViewModelBase : ObservableObject { }
+	public abstract class ViewModelBase : ObservableObject { }
 }

@@ -1,8 +1,8 @@
 ﻿namespace MarkdownWPF
 {
-    public enum StyleResourceMode
-    {
-        Static,
-        Dynamic,
-    }
+	public enum StyleResourceMode
+	{
+		Static,
+		Dynamic,
+	}
 }
