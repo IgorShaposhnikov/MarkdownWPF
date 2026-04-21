@@ -36,7 +36,7 @@ Or via Visual Studio: **Manage NuGet Packages** → enable **Include prerelease*
 
 ## Quick start
 
-1) Merge the default theme dictionary (recommended):
+1) Merge the default theme dictionary:
 ```xml
 <Application.Resources>
     <ResourceDictionary>
