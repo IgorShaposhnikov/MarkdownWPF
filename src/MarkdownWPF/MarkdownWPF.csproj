@@ -1,11 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFrameworks>net8.0-windows;net472</TargetFrameworks>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12.0</LangVersion>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>MarkdownWPF</PackageId>
+    <Authors>Igor Shaposhnikov</Authors>
+    <Version>1.0.0-preview2</Version>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>High-performance, true UI-virtualized Markdown renderer for WPF based on Markdig. Renders Markdown into lightweight WPF blocks inside a VirtualizingStackPanel for smooth scrolling on large documents. Includes a flexible XAML styling system (base + override styles), theming support, and memory-aware image decoding.</Description>
+    <PackageReleaseNotes>
+      <PackageReleaseNotes>Added support for .NET Framework 4.7.2.</PackageReleaseNotes>
+    </PackageReleaseNotes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Markdig" Version="1.1.1" />
