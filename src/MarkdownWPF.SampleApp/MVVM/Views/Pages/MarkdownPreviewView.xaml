@@ -1,4 +1,4 @@
-﻿<UserControl
+<UserControl
     x:Class="MarkdownWPF.SampleApp.Mvvm.Views.Pages.MarkdownPreviewView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -78,6 +78,7 @@
             Background="Transparent">
             <md:MarkdownViewer
                 Markdown="{Binding Model.MarkdownInput, UpdateSourceTrigger=PropertyChanged}"
+                Pipeline="{Binding Model.HtmlPipeline}"
                 StyleResourceMode="Dynamic"
                 TextElement.FontSize="14" />
         </Border>

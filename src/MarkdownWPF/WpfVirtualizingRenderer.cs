@@ -109,5 +109,16 @@ namespace MarkdownWPF
 				MarkdownProperties.SetIsLastChild(element, true);
 			}
 		}
+
+		public void ReplaceRenderer<T>(MarkdownObjectRenderer<WpfVirtualizingRenderer, T> newRenderer) where T : MarkdownObject
+		{
+			var toRemove = ObjectRenderers.OfType<MarkdownObjectRenderer<WpfVirtualizingRenderer, T>>().ToList();
+			foreach (var r in toRemove)
+			{
+				ObjectRenderers.Remove(r);
+			}
+
+			ObjectRenderers.Insert(0, newRenderer);
+		}
 	}
 }
