@@ -26,10 +26,10 @@ Instead of rendering everything into a heavy `FlowDocument`, **MarkdownWPF** gen
 
 ## Installation
 
-Install the preview package:
+Install the package:
 
 ```bash
-dotnet add package MarkdownWPF --prerelease
+dotnet add package MarkdownWPF
 ```
 
 Or via Visual Studio: **Manage NuGet Packages** → enable **Include prerelease** → search for `MarkdownWPF`.
