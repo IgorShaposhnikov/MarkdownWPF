@@ -72,15 +72,23 @@
             HorizontalAlignment="Stretch"
             Background="#E0E0E0" />
 
-        <Border
+        <ScrollViewer
             Grid.Column="2"
-            Padding="0"
+            VerticalScrollBarVisibility="Auto"
             Background="Transparent">
-            <md:MarkdownViewer
-                Markdown="{Binding Model.MarkdownInput, UpdateSourceTrigger=PropertyChanged}"
-                Pipeline="{Binding Model.HtmlPipeline}"
-                StyleResourceMode="Dynamic"
-                TextElement.FontSize="14" />
-        </Border>
+            <StackPanel>
+                <TextBlock
+                    Text="Live Markdown Preview"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Margin="0,0,0,8" />
+                <md:MarkdownViewer
+                    Markdown="{Binding Model.MarkdownInput, UpdateSourceTrigger=PropertyChanged}"
+                    Pipeline="{Binding Model.HtmlPipeline}"
+                    StyleResourceMode="Dynamic"
+                    IsScrollViewerEnabled="False"
+                    TextElement.FontSize="14" />
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

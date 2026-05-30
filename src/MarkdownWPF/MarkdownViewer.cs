@@ -27,6 +27,10 @@ namespace MarkdownWPF
 			DependencyProperty.Register(nameof(ImageMaxDecodeWidth), typeof(int), typeof(MarkdownViewer),
 				new PropertyMetadata(0, OnMarkdownChanged));
 
+		public static readonly DependencyProperty IsScrollViewerEnabledProperty =
+			DependencyProperty.Register(nameof(IsScrollViewerEnabled), typeof(bool), typeof(MarkdownViewer),
+				new PropertyMetadata(true, OnScrollViewerEnabledChanged));
+
 		public MarkdownPipeline Pipeline
 		{
 			get => (MarkdownPipeline)GetValue(PipelineProperty);
@@ -51,25 +55,51 @@ namespace MarkdownWPF
 			set => SetValue(ImageMaxDecodeWidthProperty, value);
 		}
 
+		public bool IsScrollViewerEnabled
+		{
+			get => (bool)GetValue(IsScrollViewerEnabledProperty);
+			set => SetValue(IsScrollViewerEnabledProperty, value);
+		}
+
 		public MarkdownViewer()
 		{
 			VirtualizingPanel.SetScrollUnit(this, ScrollUnit.Pixel);
 			VirtualizingPanel.SetIsVirtualizing(this, true);
 			VirtualizingPanel.SetVirtualizationMode(this, VirtualizationMode.Recycling);
-			ScrollViewer.SetCanContentScroll(this, true);
 
 			var factory = new FrameworkElementFactory(typeof(VirtualizingStackPanel));
 			ItemsPanel = new ItemsPanelTemplate(factory);
 
-			var template = new ControlTemplate(typeof(ItemsControl));
-			var scrollViewer = new FrameworkElementFactory(typeof(ScrollViewer));
-			scrollViewer.SetValue(ScrollViewer.PaddingProperty, new Thickness(15));
-			scrollViewer.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
+			UpdateTemplate();
+		}
 
-			var presenter = new FrameworkElementFactory(typeof(ItemsPresenter));
-			scrollViewer.AppendChild(presenter);
-			template.VisualTree = scrollViewer;
+		private void UpdateTemplate()
+		{
+			var template = new ControlTemplate(typeof(ItemsControl));
+
+			if (IsScrollViewerEnabled)
+			{
+				ScrollViewer.SetCanContentScroll(this, true);
+
+				var scrollViewer = new FrameworkElementFactory(typeof(ScrollViewer));
+				scrollViewer.SetValue(ScrollViewer.PaddingProperty, new Thickness(15));
+				scrollViewer.SetValue(ScrollViewer.VerticalScrollBarVisibilityProperty, ScrollBarVisibility.Auto);
+				scrollViewer.AppendChild(new FrameworkElementFactory(typeof(ItemsPresenter)));
+				template.VisualTree = scrollViewer;
+			}
+			else
+			{
+				ScrollViewer.SetCanContentScroll(this, false);
+				template.VisualTree = new FrameworkElementFactory(typeof(ItemsPresenter));
+			}
+
 			Template = template;
+		}
+
+		private static void OnScrollViewerEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			if (d is MarkdownViewer viewer)
+				viewer.UpdateTemplate();
 		}
 
 		private static void OnMarkdownChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
