@@ -26,6 +26,7 @@ namespace MarkdownWPF
 			ObjectRenderers.Add(new CodeBlockRenderer());
 			ObjectRenderers.Add(new ListRenderer());
 			ObjectRenderers.Add(new ListItemRenderer());
+			ObjectRenderers.Add(new TaskListRenderer());
 			ObjectRenderers.Add(new ThematicBreakRenderer());
 			ObjectRenderers.Add(new BlockQuoteRenderer());
 
