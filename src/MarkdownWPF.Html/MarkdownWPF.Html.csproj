@@ -2,7 +2,18 @@
 
   <PropertyGroup>
     <TargetFrameworks>net8.0-windows;net472</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>MarkdownWPF.Html</PackageId>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Description>HTML-in-markdown rendering extension for MarkdownWPF. Adds support for HTML tags &lt;table&gt;, &lt;ul&gt;/&lt;ol&gt;, &lt;img&gt;, &lt;a&gt;, and inline formatting (&lt;b&gt;, &lt;i&gt;, &lt;u&gt;, &lt;s&gt;, &lt;code&gt;) inside Markdown documents rendered by MarkdownWPF.</Description>
+    <PackageReleaseNotes>
+      Initial release: HTML tag rendering (tables, lists, images, links), inline formatting support, integration with MarkdownWPF styling system.
+    </PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\..\README.md" Pack="True" PackagePath="\" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" />
