@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Markdig" Version="1.1.1" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.12.4" />
+  </ItemGroup>
+</Project>
