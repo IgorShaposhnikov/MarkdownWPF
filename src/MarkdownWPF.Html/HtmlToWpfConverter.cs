@@ -24,6 +24,7 @@ namespace MarkdownWPF.Html
 			RegisterHandler(new LinkHandler());
 			RegisterHandler(new LineBreakHandler());
 			RegisterHandler(new ListHandler());
+			RegisterHandler(new TableHandler());
 		}
 
 		private void RegisterHandler(IHtmlTagHandler handler)
