@@ -35,6 +35,7 @@ namespace MarkdownWPF
 
 			ObjectRenderers.Add(new EmphasisRenderer());
 			ObjectRenderers.Add(new LinkInlineRenderer());
+			ObjectRenderers.Add(new AutolinkInlineRenderer());
 			ObjectRenderers.Add(new LiteralInlineRenderer());
 			ObjectRenderers.Add(new CodeInlineRenderer());
 			ObjectRenderers.Add(new LineBreakInlineRenderer());
