@@ -16,6 +16,18 @@ namespace MarkdownWPF
 
 		private readonly Dictionary<string, Style?> _styleCache = new();
 
+		private static readonly Dictionary<string, string> _styleBaseFallback = new()
+		{
+			["MarkdownBlockQuoteStyle"] = "MarkdownBlockquoteStyleBase",
+		};
+
+		private static string GetBaseStyleKey(string styleKey)
+		{
+			if (_styleBaseFallback.TryGetValue(styleKey, out var baseKey))
+				return baseKey;
+			return styleKey + "Base";
+		}
+
 		public WpfVirtualizingRenderer(FrameworkElement? frameworkElement = null, StyleResourceMode styleResourceMode = StyleResourceMode.Static)
 		{
 			ContextElement = frameworkElement;
@@ -50,18 +62,35 @@ namespace MarkdownWPF
 			return RootElements;
 		}
 
+		private Style? ResolveStyle(string styleKey)
+		{
+			var style = ContextElement?.TryFindResource(styleKey) as Style;
+			if (style != null)
+				return style;
+
+			var baseKey = GetBaseStyleKey(styleKey);
+			return ContextElement?.TryFindResource(baseKey) as Style;
+		}
+
 		// For block elements (Border, TextBlock, Grid)
 		public void ApplyStyle(FrameworkElement element, string styleKey)
 		{
 			if (StyleResourceMode == StyleResourceMode.Dynamic)
 			{
-				element.SetResourceReference(FrameworkElement.StyleProperty, styleKey);
+				if (ContextElement?.TryFindResource(styleKey) != null)
+				{
+					element.SetResourceReference(FrameworkElement.StyleProperty, styleKey);
+				}
+				else
+				{
+					element.SetResourceReference(FrameworkElement.StyleProperty, GetBaseStyleKey(styleKey));
+				}
 				return;
 			}
 
 			if (!_styleCache.TryGetValue(styleKey, out var style))
 			{
-				style = ContextElement?.TryFindResource(styleKey) as Style;
+				style = ResolveStyle(styleKey);
 				_styleCache[styleKey] = style;
 			}
 
@@ -76,13 +105,20 @@ namespace MarkdownWPF
 		{
 			if (StyleResourceMode == StyleResourceMode.Dynamic)
 			{
-				element.SetResourceReference(FrameworkContentElement.StyleProperty, styleKey);
+				if (ContextElement?.TryFindResource(styleKey) != null)
+				{
+					element.SetResourceReference(FrameworkContentElement.StyleProperty, styleKey);
+				}
+				else
+				{
+					element.SetResourceReference(FrameworkContentElement.StyleProperty, GetBaseStyleKey(styleKey));
+				}
 				return;
 			}
 
 			if (!_styleCache.TryGetValue(styleKey, out var style))
 			{
-				style = ContextElement?.TryFindResource(styleKey) as Style;
+				style = ResolveStyle(styleKey);
 				_styleCache[styleKey] = style;
 			}
 
