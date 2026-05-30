@@ -66,13 +66,7 @@ namespace MarkdownWPF.Renderers
 			{
 				if (Uri.TryCreate(obj.Url, UriKind.RelativeOrAbsolute, out var uri))
 				{
-					var bitmap = new BitmapImage();
-					bitmap.BeginInit();
-					bitmap.UriSource = uri;
-					bitmap.CacheOption = BitmapCacheOption.OnLoad;
-
-					bitmap.DecodePixelWidth = renderer.OptimalImageDecodeWidth;
-					bitmap.EndInit();
+					var bitmap = ImageCache.GetOrAdd(obj.Url, renderer.OptimalImageDecodeWidth);
 
 					var image = new Image
 					{
