@@ -50,7 +50,6 @@ Add the built-in resource dictionary to your `App.xaml`:
 
 ```xml
 <Window xmlns:md="clr-namespace:MarkdownWPF;assembly=MarkdownWPF">
-
     <md:MarkdownViewer Markdown="{Binding MarkdownText}" />
 </Window>
 ```
@@ -120,17 +119,6 @@ When `true`, the `MarkdownViewer` includes a built-in `ScrollViewer`. Set to `fa
 ### `ImageMaxDecodeWidth` (int, default 0)
 
 Limits the decode size of images. When set to `0`, the viewer automatically uses the screen or window width. This prevents loading a 4000 px photo at full resolution when it will be displayed at 800 px.
-
-### `ResourceLoadFailed` (event)
-
-Fires when an image fails to load or a hyperlink cannot be navigated:
-
-```csharp
-viewer.ResourceLoadFailed += (s, e) =>
-{
-    Console.WriteLine($"Failed: {e.Url}, Error: {e.Exception?.Message}");
-};
-```
 
 ## Virtualization & performance
 
