@@ -1,8 +1,10 @@
 using HtmlAgilityPack;
 using Markdig.Renderers;
 using Markdig.Syntax.Inlines;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace MarkdownWPF.Html.Renderers
 {
@@ -50,18 +52,25 @@ namespace MarkdownWPF.Html.Renderers
 				else if(tagName == "br")
 					AddInlineToContext(renderer, new LineBreak());
 			}
-			// Если это открытие форматирования (<b>, <i>, <u>)
-			else if(new[] { "b", "strong", "i", "em", "u", "ins" }.Contains(tagName))
+			// Если это открытие форматирования (<b>, <i>, <u>, <s>, <code>)
+			else if(new[] { "b", "strong", "i", "em", "u", "ins", "s", "strike", "del" }.Contains(tagName))
 			{
 				var span = tagName switch
 				{
 					"b" or "strong" => new Bold(),
 					"i" or "em" => new Italic(),
 					"u" or "ins" => new Underline(),
+					"s" or "strike" or "del" => new Span { TextDecorations = TextDecorations.Strikethrough },
 					_ => new Span()
 				};
 				AddInlineToContext(renderer, span);
 				renderer.Push(span);
+			}
+			else if(tagName == "code")
+			{
+				var codeSpan = new Span { FontFamily = new FontFamily("Consolas") };
+				AddInlineToContext(renderer, codeSpan);
+				renderer.Push(codeSpan);
 			}
 		}
 

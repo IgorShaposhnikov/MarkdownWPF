@@ -92,6 +92,17 @@ namespace MarkdownWPF.Html
 						case "i" or "em":
 							var i = new Italic(); PopulateInlines(child, i.Inlines, renderer); inlines.Add(i);
 							break;
+						case "u" or "ins":
+							var underline = new Underline(); PopulateInlines(child, underline.Inlines, renderer); inlines.Add(underline);
+							break;
+						case "s" or "strike" or "del":
+							var strikeSpan = new Span { TextDecorations = TextDecorations.Strikethrough }; PopulateInlines(child, strikeSpan.Inlines, renderer); inlines.Add(strikeSpan);
+							break;
+						case "code":
+							var codeRun = new Run(child.InnerText);
+							renderer.ApplyStyle(codeRun, MarkdownStyles.CodeInline);
+							inlines.Add(codeRun);
+							break;
 					}
 				}
 			}
