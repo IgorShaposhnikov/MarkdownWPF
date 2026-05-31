@@ -1,6 +1,9 @@
 using Markdig.Renderers;
 using Markdig.Syntax;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace MarkdownWPF.Renderers
 {
@@ -23,6 +26,34 @@ namespace MarkdownWPF.Renderers
 				VerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
 				Content = tb
 			};
+
+			sv.PreviewMouseWheel += (sender, e) =>
+			{
+				if (e.Handled)
+					return;
+
+				if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+					return;
+
+				e.Handled = true;
+
+				var args = new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+				{
+					RoutedEvent = UIElement.MouseWheelEvent
+				};
+
+				for (var parent = VisualTreeHelper.GetParent((DependencyObject)sender);
+					 parent != null;
+					 parent = VisualTreeHelper.GetParent(parent))
+				{
+					if (parent is ScrollViewer scrollViewer)
+					{
+						scrollViewer.RaiseEvent(args);
+						return;
+					}
+				}
+			};
+
 			border.Child = sv;
 
 			if (renderer.CurrentContext == null)
