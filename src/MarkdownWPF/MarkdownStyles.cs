@@ -33,5 +33,7 @@ namespace MarkdownWPF
 		public const string StrongEmphasis = "MarkdownStrongStyle";   // Bold
 		public const string Strikethrough = "MarkdownStrikethroughStyle";
 		public const string Mark = "MarkdownMarkStyle";               // Highlight
+		public const string Subscript = "MarkdownSubscriptStyle";
+		public const string Superscript = "MarkdownSuperscriptStyle";
 	}
 }

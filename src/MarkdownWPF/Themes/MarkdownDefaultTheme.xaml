@@ -294,4 +294,14 @@
         <Setter Property="Background" Value="{DynamicResource MarkdownHighlightBrush}" />
     </Style>
 
+    <Style x:Key="MarkdownSubscriptStyle" TargetType="Span">
+        <Setter Property="BaselineAlignment" Value="Subscript" />
+        <Setter Property="FontSize" Value="10" />
+    </Style>
+
+    <Style x:Key="MarkdownSuperscriptStyle" TargetType="Span">
+        <Setter Property="BaselineAlignment" Value="Superscript" />
+        <Setter Property="FontSize" Value="10" />
+    </Style>
+
 </ResourceDictionary>

@@ -18,6 +18,14 @@ namespace MarkdownWPF.Renderers
 				if (obj.DelimiterCount == 1 || obj.DelimiterCount == 3)
 					renderer.ApplyStyle(span, MarkdownStyles.Emphasis);
 			}
+			else if (obj.DelimiterChar == '~' && obj.DelimiterCount == 1)
+			{
+				renderer.ApplyStyle(span, MarkdownStyles.Subscript);
+			}
+			else if (obj.DelimiterChar == '^' && obj.DelimiterCount == 1)
+			{
+				renderer.ApplyStyle(span, MarkdownStyles.Superscript);
+			}
 			else if (obj.DelimiterChar == '~' && obj.DelimiterCount == 2)
 			{
 				renderer.ApplyStyle(span, MarkdownStyles.Strikethrough);
