@@ -13,6 +13,7 @@ namespace MarkdownWPF
 		public FrameworkElement? ContextElement { get; }
 		public StyleResourceMode StyleResourceMode { get; }
 		public int OptimalImageDecodeWidth { get; set; } = 1920;
+		public bool IsInsideListItem { get; set; }
 
 		private readonly Dictionary<string, Style?> _styleCache = new();
 

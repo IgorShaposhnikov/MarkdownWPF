@@ -15,7 +15,7 @@ namespace MarkdownWPF.Renderers
 			}
 
 			var tb = new TextBlock();
-			renderer.ApplyStyle(tb, MarkdownStyles.Paragraph);
+			renderer.ApplyStyle(tb, renderer.IsInsideListItem ? MarkdownStyles.Paragraph + "Base" : MarkdownStyles.Paragraph);
 			renderer.HandleLastChildMargin(tb, obj);
 
 			if (renderer.CurrentContext == null)

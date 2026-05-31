@@ -1,4 +1,4 @@
-﻿<Window
+<Window
     x:Class="MarkdownWPF.SampleApp.Mvvm.Views.Windows.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,7 +10,7 @@
     Width="800"
     Height="450"
     d:DataContext="{d:DesignInstance Type=viewmodels:MainViewModel}"
-    ResizeMode="NoResize"
+    ResizeMode="CanResize"
     mc:Ignorable="d">
     <Grid>
         <ContentControl Content="{Binding CurrentViewModel}" />

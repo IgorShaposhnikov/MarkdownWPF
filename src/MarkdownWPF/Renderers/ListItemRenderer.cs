@@ -39,12 +39,16 @@ namespace MarkdownWPF.Renderers
 			renderer.ApplyStyle(grid, MarkdownStyles.ListItem);
 
 			var contentPanel = new StackPanel();
+
 			Grid.SetColumn(contentPanel, 1);
 			grid.Children.Add(contentPanel);
 
+			var prev = renderer.IsInsideListItem;
+			renderer.IsInsideListItem = true;
 			renderer.Push(contentPanel);
 			renderer.WriteChildren(listItemBlock);
 			renderer.Pop();
+			renderer.IsInsideListItem = prev;
 
 			if (renderer.CurrentContext is Panel parentPanel)
 			{

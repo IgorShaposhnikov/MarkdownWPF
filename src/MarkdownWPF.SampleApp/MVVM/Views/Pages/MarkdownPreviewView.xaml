@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:ext="clr-namespace:MarkdownWPF.Extensions;assembly=MarkdownWPF"
     xmlns:local="clr-namespace:MarkdownWPF.SampleApp.Mvvm.Views.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:md="clr-namespace:MarkdownWPF;assembly=MarkdownWPF"
@@ -47,6 +48,43 @@
             TargetType="TextBlock">
             <Setter Property="Foreground" Value="Blue" />
         </Style>
+
+        <Style x:Key="MarkdownParagraphStyleBase" TargetType="TextBlock">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="LineHeight" Value="21" />
+            <Style.Triggers>
+                <Trigger Property="ext:MarkdownProperties.IsLastChild" Value="True">
+                    <Setter Property="Margin" Value="0" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="MarkdownParagraphStyle"
+            BasedOn="{StaticResource MarkdownParagraphStyleBase}"
+            TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Setter Property="Foreground" Value="{DynamicResource MarkdownTextBrush}" />
+        </Style>
+
+        <Style x:Key="MarkdownListStyleBase" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0,0,0,16" />
+            <Style.Triggers>
+                <Trigger Property="ext:MarkdownProperties.IsLastChild" Value="True">
+                    <Setter Property="Margin" Value="0,0,0,0" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style
+            x:Key="MarkdownListStyle"
+            BasedOn="{StaticResource MarkdownListStyleBase}"
+            TargetType="StackPanel" />
+
+        <Style x:Key="MarkdownListItemStyleBase" TargetType="Grid">
+            <Setter Property="Margin" Value="0,2,0,0" />
+        </Style>
+
     </UserControl.Resources>
 
 
