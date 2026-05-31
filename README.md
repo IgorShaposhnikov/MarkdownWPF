@@ -12,6 +12,8 @@ Instead of rendering into a heavy `FlowDocument`, **MarkdownWPF** generates ligh
 - **XAML styling** — Base + override pattern, Static and Dynamic resource resolution
 - **HTML-in-markdown** — Optional extension for `<table>`, `<ul>`/`<ol>`, `<img>`, `<a>`, inline formatting
 - **GFM task lists** — Rendered as interactive `CheckBox` elements
+- **Typography replacements** — Pandoc symbols `(c)`, `(r)`, `(tm)`, `+-`, ellipsis, en/em dashes, punctuation normalization, comma collapse
+- **Subscript / Superscript** — H~2~O and E=mc^2^ with `BaselineAlignment` and reduced `FontSize`
 - **Image caching** — Static `ConcurrentDictionary` avoids redundant network/disk loads on re-render
 - **Nested scrolling** — `IsScrollViewerEnabled` property for embedding in external `ScrollViewer`
 - **Error diagnostics** — `ResourceLoadFailed` event for failed image loads and link navigation
@@ -163,6 +165,8 @@ All visuals are driven by standard WPF `Style` resources. The library uses a saf
 | (none)                        | `MarkdownEmphasisStyle`        | Span        |
 | (none)                        | `MarkdownStrikethroughStyle`   | Span        |
 | (none)                        | `MarkdownMarkStyle`            | Span        |
+| (none)                        | `MarkdownSubscriptStyle`       | Span        |
+| (none)                        | `MarkdownSuperscriptStyle`     | Span        |
 
 If a working style is not found in the resource tree, the renderer **automatically falls back** to the matching Base style — so partial overrides work without errors.
 
