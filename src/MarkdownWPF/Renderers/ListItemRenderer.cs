@@ -39,7 +39,7 @@ namespace MarkdownWPF.Renderers
 			renderer.ApplyStyle(grid, MarkdownStyles.ListItem);
 
 			var contentPanel = new StackPanel();
-			Grid.SetColumn(contentPanel, 0);
+			Grid.SetColumn(contentPanel, 1);
 			grid.Children.Add(contentPanel);
 
 			renderer.Push(contentPanel);
