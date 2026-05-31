@@ -7,7 +7,11 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>HTML-in-markdown rendering extension for MarkdownWPF. Adds support for HTML tags &lt;table&gt;, &lt;ul&gt;/&lt;ol&gt;, &lt;img&gt;, &lt;a&gt;, and inline formatting (&lt;b&gt;, &lt;i&gt;, &lt;u&gt;, &lt;s&gt;, &lt;code&gt;) inside Markdown documents rendered by MarkdownWPF.</Description>
     <PackageReleaseNotes>
-      Initial release: HTML tag rendering (tables, lists, images, links), inline formatting support, integration with MarkdownWPF styling system.
+      - HTML tag rendering: tables (&lt;table&gt;, &lt;tr&gt;, &lt;td&gt;, &lt;th&gt;), lists (&lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;), images, links
+      - Inline formatting: &lt;b&gt;, &lt;strong&gt;, &lt;i&gt;, &lt;em&gt;, &lt;u&gt;, &lt;ins&gt;, &lt;s&gt;, &lt;del&gt;, &lt;code&gt;
+      - Integration with MarkdownWPF styling system
+      - Full HTML table layout with dynamic Grid generation
+      - Ordered list support with custom start attribute
     </PackageReleaseNotes>
   </PropertyGroup>
 

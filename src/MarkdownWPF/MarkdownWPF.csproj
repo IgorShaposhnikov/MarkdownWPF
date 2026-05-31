@@ -9,10 +9,14 @@
     <PackageReleaseNotes>
       - Full Markdown block rendering: headings, paragraphs, code blocks, blockquotes, thematic breaks, lists (ordered/unordered), tables
       - Inline formatting: bold, italic, strikethrough, mark/highlight, code spans, hyperlinks, autolinks, images
+      - Subscript (~1) and superscript (^1) rendering with BaselineAlignment
+      - Typography replacements: Pandoc symbols ((c), (r), (tm), +-), ellipsis normalization, en/em dashes, punctuation normalization, comma collapse
       - GFM task list support with CheckBox rendering
       - HTML-in-markdown extension: tables, lists, images, links, inline formatting (&lt;b&gt;, &lt;i&gt;, &lt;u&gt;, &lt;s&gt;, &lt;code&gt;)
       - VirtualizingStackPanel with recycling mode for smooth scrolling on large documents
+      - Nested scrolling fix: code blocks no longer swallow mouse wheel events; Shift+MouseWheel passes through for horizontal scroll
       - Style system with base+override pattern, Static and Dynamic resource resolution
+      - Automatic fallback to Base styles when working style is missing
       - Image caching to avoid redundant network/disk loads on re-render
       - Nested scrolling support (IsScrollViewerEnabled property)
       - Error diagnostics: ResourceLoadFailed event for image and navigation failures
