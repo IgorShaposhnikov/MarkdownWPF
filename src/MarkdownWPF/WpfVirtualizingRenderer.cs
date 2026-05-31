@@ -52,6 +52,7 @@ namespace MarkdownWPF
 			ObjectRenderers.Add(new LiteralInlineRenderer());
 			ObjectRenderers.Add(new CodeInlineRenderer());
 			ObjectRenderers.Add(new LineBreakInlineRenderer());
+			ObjectRenderers.Add(new SmartyPantRenderer());
 			ObjectRenderers.Add(new HtmlInlineRenderer());
 			ObjectRenderers.Add(new HtmlBlockRenderer());
 		}
