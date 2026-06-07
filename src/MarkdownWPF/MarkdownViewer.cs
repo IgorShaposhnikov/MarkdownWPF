@@ -13,7 +13,7 @@ namespace MarkdownWPF
 
 		public static readonly DependencyProperty PipelineProperty =
 			DependencyProperty.Register(nameof(Pipeline), typeof(MarkdownPipeline), typeof(MarkdownViewer),
-				new PropertyMetadata(null, OnMarkdownChanged));
+				new PropertyMetadata(null, OnPipelineChanged));
 
 		public static readonly DependencyProperty MarkdownProperty =
 			DependencyProperty.Register(nameof(Markdown), typeof(string), typeof(MarkdownViewer),
@@ -113,6 +113,14 @@ namespace MarkdownWPF
 			viewer.RenderMarkdown((string)e.NewValue);
 		}
 
+		private static void OnPipelineChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+		{
+			if(d is MarkdownViewer viewer)
+			{
+				viewer.RenderMarkdown(viewer.Markdown);
+			}
+		}
+
 		private static void OnStyleResourceModeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
 		{
 			if(d is MarkdownViewer viewer)
@@ -178,6 +186,5 @@ namespace MarkdownWPF
 
 			return (int)optimalWidth;
 		}
-
 	}
 }
