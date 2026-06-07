@@ -10,7 +10,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Version>1.1.3</Version>
+		<Version>1.1.4</Version>
 		<Authors>Igor Shaposhnikov</Authors>
 		<Copyright>Copyright © 2026 Igor Shaposhnikov. All rights reserved.</Copyright>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

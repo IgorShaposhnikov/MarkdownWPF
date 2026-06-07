@@ -4,6 +4,7 @@
 		<PackageId>MarkdownWPF.Html</PackageId>
 		<PackageTags>markdown;wpf;html;renderer;html-to-wpf;xaml;netcore;netframework</PackageTags>
 		<Description>HTML-in-markdown rendering extension for MarkdownWPF. Adds support for HTML tags &lt;table&gt;, &lt;ul&gt;/&lt;ol&gt;, &lt;img&gt;, &lt;a&gt;, and inline formatting (&lt;b&gt;, &lt;i&gt;, &lt;u&gt;, &lt;s&gt;, &lt;code&gt;) inside Markdown documents rendered by MarkdownWPF.</Description>
+		<Version>1.1.3</Version>
 		<PackageReleaseNotes>
 			- HTML tag rendering: tables (&lt;table&gt;, &lt;tr&gt;, &lt;td&gt;, &lt;th&gt;), lists (&lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;), images, links
 			- Inline formatting: &lt;b&gt;, &lt;strong&gt;, &lt;i&gt;, &lt;em&gt;, &lt;u&gt;, &lt;ins&gt;, &lt;s&gt;, &lt;del&gt;, &lt;code&gt;

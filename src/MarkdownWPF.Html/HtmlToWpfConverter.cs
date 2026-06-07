@@ -6,7 +6,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace MarkdownWPF.Html
 {
@@ -16,7 +15,6 @@ namespace MarkdownWPF.Html
 
 		public HtmlToWpfConverter()
 		{
-			// Регистрируем все наши стратегии
 			RegisterHandler(new ContainerHandler());
 			RegisterHandler(new HeaderHandler());
 			RegisterHandler(new ParagraphHandler());
@@ -33,7 +31,6 @@ namespace MarkdownWPF.Html
 				_handlers[tag.ToLower()] = handler;
 		}
 
-		// Превращает список узлов HTML в список элементов WPF (для StackPanel, WrapPanel)
 		public void RenderNodesToPanel(IEnumerable<HtmlNode> nodes, Panel container, WpfVirtualizingRenderer renderer)
 		{
 			foreach(var node in nodes)
@@ -43,7 +40,6 @@ namespace MarkdownWPF.Html
 			}
 		}
 
-		// Превращает один узел в элемент WPF
 		public FrameworkElement? ConvertToElement(HtmlNode node, WpfVirtualizingRenderer renderer)
 		{
 			if(node.NodeType == HtmlNodeType.Text)
@@ -108,7 +104,6 @@ namespace MarkdownWPF.Html
 			}
 		}
 
-		// Создание гиперссылки
 		public Hyperlink CreateHyperlink(HtmlNode node, WpfVirtualizingRenderer renderer)
 		{
 			var link = new Hyperlink();
@@ -131,7 +126,6 @@ namespace MarkdownWPF.Html
 			return link;
 		}
 
-		// Создание картинки (вынеси в отдельный метод, если еще не сделал)
 		public Image CreateWpfImage(HtmlNode node)
 		{
 			var src = node.GetAttributeValue("src", "");
@@ -147,8 +141,42 @@ namespace MarkdownWPF.Html
 			{
 				var bmp = ImageCache.GetOrAdd(src);
 				img.Source = bmp;
-				if(node.Attributes.Contains("width") && double.TryParse(node.Attributes["width"].Value, out var w)) img.Width = w;
-				else if(bmp.PixelWidth > 0) img.MaxWidth = bmp.PixelWidth;
+
+				if(node.Attributes.Contains("width") && double.TryParse(node.Attributes["width"].Value, out var w)) 
+					img.Width = w;
+				else if(bmp.PixelWidth > 0) 
+					img.MaxWidth = bmp.PixelWidth;
+
+				// Force layout remeasure when async download completes
+				if(bmp.IsDownloading)
+				{
+					bmp.DownloadCompleted += (s, e) =>
+					{
+						img.Dispatcher.BeginInvoke(new Action(() =>
+						{
+							if(node.Attributes.Contains("width") && double.TryParse(node.Attributes["width"].Value, out var w2))
+								img.Width = w2;
+							else if(bmp.PixelWidth > 0)
+								img.MaxWidth = bmp.PixelWidth;
+
+							img.InvalidateMeasure();
+
+							DependencyObject parent = img;
+							while(parent != null)
+							{
+								if(parent is FrameworkElement fe)
+								{
+									fe.InvalidateMeasure();
+								}
+
+								// Safe tree-traversal
+								parent = (parent is Visual)
+									? VisualTreeHelper.GetParent(parent)
+									: LogicalTreeHelper.GetParent(parent);
+							}
+						}));
+					};
+				}
 			}
 			catch { }
 			return img;

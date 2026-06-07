@@ -6,7 +6,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace MarkdownWPF.Renderers
 {
@@ -64,7 +63,7 @@ namespace MarkdownWPF.Renderers
 
 			try
 			{
-				if (Uri.TryCreate(obj.Url, UriKind.RelativeOrAbsolute, out var uri))
+				if(Uri.TryCreate(obj.Url, UriKind.RelativeOrAbsolute, out var uri))
 				{
 					var bitmap = ImageCache.GetOrAdd(obj.Url, renderer.OptimalImageDecodeWidth);
 
@@ -78,13 +77,39 @@ namespace MarkdownWPF.Renderers
 					};
 					RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
 
-					if (renderer.ContextElement != null)
+					if(renderer.ContextElement != null)
 					{
 						var binding = new Binding(nameof(FrameworkElement.ActualWidth))
 						{
 							Source = renderer.ContextElement
 						};
 						BindingOperations.SetBinding(image, FrameworkElement.MaxWidthProperty, binding);
+					}
+
+					// Force layout remeasure when async download completes
+					if(bitmap.IsDownloading)
+					{
+						bitmap.DownloadCompleted += (s, e) =>
+						{
+							image.Dispatcher.BeginInvoke(new Action(() =>
+							{
+								image.InvalidateMeasure();
+
+								DependencyObject parent = image;
+								while(parent != null)
+								{
+									if(parent is FrameworkElement fe)
+									{
+										fe.InvalidateMeasure();
+									}
+
+									// Safe tree-traversal
+									parent = (parent is Visual)
+										? VisualTreeHelper.GetParent(parent)
+										: LogicalTreeHelper.GetParent(parent);
+								}
+							}));
+						};
 					}
 
 					inlineContainer.Child = image;
@@ -96,8 +121,10 @@ namespace MarkdownWPF.Renderers
 				inlineContainer.Child = tb;
 			}
 
-			if (renderer.CurrentContext is Span s) s.Inlines.Add(inlineContainer);
-			else if (renderer.CurrentContext is TextBlock t) t.Inlines.Add(inlineContainer);
+			if(renderer.CurrentContext is Span s) 
+				s.Inlines.Add(inlineContainer);
+			else if(renderer.CurrentContext is TextBlock t) 
+				t.Inlines.Add(inlineContainer);
 		}
 	}
 }
