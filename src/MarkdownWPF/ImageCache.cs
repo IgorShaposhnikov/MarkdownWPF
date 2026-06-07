@@ -11,12 +11,38 @@ namespace MarkdownWPF
 		{
 			return _cache.GetOrAdd(url, _ =>
 			{
+				var uri = new Uri(url, UriKind.RelativeOrAbsolute);
+				var targetWidth = 0;
+
+				if(decodePixelWidth > 0)
+				{
+					try
+					{
+						var decoder = BitmapDecoder.Create(uri, BitmapCreateOptions.DelayCreation, BitmapCacheOption.None);
+						var frame = decoder.Frames[0];
+
+						// Only downscale if the original image is wider than our optimal width
+						if(frame.PixelWidth > decodePixelWidth)
+						{
+							targetWidth = decodePixelWidth;
+						}
+					}
+					catch
+					{
+						// Fallback if decoder inspection fails
+						targetWidth = decodePixelWidth;
+					}
+				}
+
 				var bitmap = new BitmapImage();
 				bitmap.BeginInit();
-				bitmap.UriSource = new Uri(url, UriKind.RelativeOrAbsolute);
+				bitmap.UriSource = uri;
 				bitmap.CacheOption = BitmapCacheOption.OnLoad;
-				if (decodePixelWidth > 0)
-					bitmap.DecodePixelWidth = decodePixelWidth;
+
+				// Only caps large images
+				if(targetWidth > 0)
+					bitmap.DecodePixelWidth = targetWidth; 
+
 				bitmap.EndInit();
 				return bitmap;
 			});

@@ -73,7 +73,8 @@ namespace MarkdownWPF.Renderers
 						Source = bitmap,
 						Stretch = Stretch.Uniform,
 						Margin = new Thickness(0, 8, 0, 8),
-						HorizontalAlignment = HorizontalAlignment.Left
+						HorizontalAlignment = HorizontalAlignment.Left,
+						StretchDirection = StretchDirection.DownOnly,
 					};
 					RenderOptions.SetBitmapScalingMode(image, BitmapScalingMode.HighQuality);
 

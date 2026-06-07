@@ -112,7 +112,7 @@
 
         <ScrollViewer
             Grid.Column="2"
-            Background="Transparent"
+            Background="#F6F6F6"
             VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <TextBlock
